@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NGUYENNAM.mochiai</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='10' width='56' height='48' rx='22' fill='%23f7b6cb'/%3E%3Crect x='18' y='26' width='8' height='11' rx='4' fill='%232c2838'/%3E%3Crect x='38' y='26' width='8' height='11' rx='4' fill='%232c2838'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script type="module" src="https://unpkg.com/esp-web-tools@10.0.1/dist/web/install-button.js?module"></script>
+<style>
+:root {
+  --bg: #fbf6f8; --bg2: #f3ecf7; --surface: rgba(255,255,255,.82); --surface-solid: #ffffff;
+  --text: #241f2e; --muted: #6d6579; --line: #ebe2ec; --shadow: 0 10px 30px rgba(80, 40, 90, .08);
+  --accent: #d24b84; --accent2: #8a5cf0; --accent-text: #ffffff; --code: #f3edf2;
+  --ok: #1d9a6a; --warn: #b9781a;
+  --w-clk: #e07b00; --w-ws: #d23f8a; --w-data: #2f6fd6; --w-disp: #7a4fd0; --w-touch: #1d9a6a;
+  --p33: #d63a3a; --p5: #9b1c1c; --gnd: #5b5b5b;
+  --board: #1f2a44; --board-text: #e9eefc; --module: #fbf7fb; --module-stroke: #d9cfe0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141219; --bg2: #1b1424; --surface: rgba(32,28,40,.85); --surface-solid: #201c28;
+    --text: #efebf5; --muted: #a8a0b6; --line: #332e3e; --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --accent: #f27aab; --accent2: #a98af7; --accent-text: #1a0f1f; --code: #2a2533;
+    --module: #29243a; --module-stroke: #4a4359; --board: #0d1630; --gnd: #a0a0a0; --p5: #e06a6a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141219; --bg2: #1b1424; --surface: rgba(32,28,40,.85); --surface-solid: #201c28;
+  --text: #efebf5; --muted: #a8a0b6; --line: #332e3e; --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --accent: #f27aab; --accent2: #a98af7; --accent-text: #1a0f1f; --code: #2a2533;
+  --module: #29243a; --module-stroke: #4a4359; --board: #0d1630; --gnd: #a0a0a0; --p5: #e06a6a;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; color: var(--text);
+  font: 15px/1.55 "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--accent2) 14%, transparent), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  background-attachment: fixed;
+}
+
+/* ---------- top bar ---------- */
+header {
+  position: sticky; top: 0; z-index: 10; height: 64px;
+  display: flex; align-items: center; gap: 28px; padding: 0 clamp(16px, 3vw, 40px);
+  background: var(--surface); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 21px; letter-spacing: -.3px; text-decoration: none; color: var(--text); }
+.brand svg { width: 36px; height: 36px; }
+.brand span { color: var(--accent); }
+nav { display: flex; gap: 4px; }
+nav a { color: var(--muted); text-decoration: none; font-weight: 600; padding: 8px 14px; border-radius: 10px; }
+nav a:hover, nav a.active { color: var(--text); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.chip { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+  padding: 6px 12px; border-radius: 999px; background: var(--surface-solid); border: 1px solid var(--line); }
+.chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); display: inline-block; }
+.chip.bad i { background: var(--warn); }
+
+/* ---------- layout ---------- */
+.wrap { max-width: 1680px; margin: 0 auto; padding: 24px clamp(16px, 3vw, 40px) 40px; }
+.hero { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.hero h1 { margin: 0; font-size: clamp(26px, 2.4vw, 36px); letter-spacing: -.6px; line-height: 1.2; }
+.hero h1 b { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { margin: 6px 0 0; color: var(--muted); }
+.steps { display: flex; gap: 8px; flex-wrap: wrap; }
+.steps span { font-size: 13px; font-weight: 600; color: var(--muted); background: var(--surface); border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px; }
+.steps b { color: var(--accent); margin-right: 4px; }
+
+.grid { display: grid; grid-template-columns: minmax(340px, 400px) 1fr; gap: 22px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 22px; }
+.side { display: flex; flex-direction: column; gap: 18px; position: sticky; top: 84px; }
+.label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+.label .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-text); font-size: 12px; letter-spacing: 0; }
+
+/* board picker */
+.boards { display: grid; gap: 10px; }
+.boards input { position: absolute; opacity: 0; pointer-events: none; }
+.boards label { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; cursor: pointer;
+  padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--surface-solid); transition: border-color .15s, transform .15s; }
+.boards label:hover { transform: translateY(-1px); }
+.boards input:checked + label { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent); }
+.boards input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: 2px; }
+.chipicon { width: 44px; height: 44px; border-radius: 10px; background: var(--board); display: grid; place-items: center; color: var(--board-text); font-size: 11px; font-weight: 800; }
+.boards b { display: block; font-size: 16px; }
+.boards small { color: var(--muted); }
+.tag { display: inline-block; font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 1px 9px; margin-left: 6px; vertical-align: 1px; }
+.tag.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
+.tag.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+
+/* flash */
+.btn { width: 100%; font: inherit; font-size: 17px; font-weight: 700; border: 0; border-radius: 14px; cursor: pointer;
+  padding: 15px 20px; color: #fff; background: linear-gradient(90deg, var(--accent), var(--accent2));
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 30%, transparent); transition: transform .15s, filter .15s; }
+.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+esp-web-install-button { display: block; }
+.fw { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.fw b { color: var(--text); }
+.warnbox { display: block; color: var(--warn); font-weight: 600; font-size: 14px; }
+ol { margin: 0; padding-left: 20px; }
+ol li { margin: 5px 0; }
+code { background: var(--code); border-radius: 6px; padding: 1px 6px; font-family: Consolas, monospace; font-size: 13px; }
+.hint { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+/* main: diagram */
+.main { min-width: 0; }
+.mainhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.mainhead h2 { margin: 0; font-size: 20px; }
+.mainhead h2 small { font-weight: 500; color: var(--muted); font-size: 14px; margin-left: 6px; }
+.seg { display: inline-flex; background: var(--surface-solid); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 600; border: 0; background: none; color: var(--muted); padding: 7px 16px; border-radius: 9px; cursor: pointer; }
+.seg button.on { background: var(--accent); color: var(--accent-text); }
+.diagram { overflow-x: auto; }
+.diagram svg { display: block; width: 100%; height: auto; min-width: 720px; }
+.diagram.photo { border-radius: 14px; overflow: auto; border: 1px solid var(--line); background: #fff; }
+.diagram.photo > svg { min-width: 900px; }
+.diagram.photo { position: relative; cursor: zoom-in; }
+.diagram.photo.full { position: fixed; inset: 0; z-index: 100; border-radius: 0; border: 0; cursor: zoom-out; display: grid; place-items: center; }
+.diagram.photo.full > svg { width: min(100vw, calc(100vh * 16 / 9)); min-width: 1200px; height: auto; }
+.zoomhint { position: absolute; right: 12px; top: 12px; font-size: 13px; font-weight: 600; color: #fff; background: rgba(36,31,46,.75); padding: 5px 10px; border-radius: 999px; pointer-events: none; }
+.diagram.photo.full .zoomhint { position: fixed; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+[data-view="table"] { overflow-x: auto; }
+[data-view="table"] table { min-width: 560px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: 3px; margin-right: 6px; }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 18px; }
+.note { padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
+.note b { display: block; margin-bottom: 4px; }
+.hidden { display: none !important; }
+footer { text-align: center; color: var(--muted); font-size: 13px; padding: 10px 0 24px; }
+
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: 1fr; }
+  .side { position: static; }
+  nav { display: none; }
+}
+@media (max-width: 520px) {
+  header { gap: 12px; }
+  .chip { font-size: 12px; padding: 5px 10px; }
+  .chip .long { display: none; }
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="#">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="10" width="56" height="48" rx="22" fill="#f7b6cb"/><rect x="18" y="26" width="8" height="11" rx="4" fill="#2c2838"/><rect x="38" y="26" width="8" height="11" rx="4" fill="#2c2838"/><circle cx="20" cy="28" r="1.6" fill="#fff"/><circle cx="40" cy="28" r="1.6" fill="#fff"/><path d="M28 44 q4 4 8 0" stroke="#2c2838" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+    NGUYENNAM.<span>mochiai</span>
+  </a>
+  <nav>
+    <a href="#nap" class="active">Nạp firmware</a>
+    <a href="#daydien">Đấu dây</a>
+    <a href="#luuy">Lưu ý</a>
+  </nav>
+  <span class="chip" id="envChip"><i></i><span id="envText">Đang kiểm tra trình duyệt…</span></span>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Nạp firmware cho <b>Mochi AI</b></h1>
+      <p>Thú cưng để bàn biết nói chuyện, chạy trên ESP32. Chọn mạch, đấu dây theo sơ đồ, bấm nạp là chạy.</p>
+    </div>
+    <div class="steps"><span><b>1</b>Chọn mạch</span><span><b>2</b>Đấu dây</span><span><b>3</b>Nạp firmware</span><span><b>4</b>Kết nối Wi-Fi</span></div>
+  </div>
+
+  <div class="grid">
+    <!-- ========== left column ========== -->
+    <aside class="side" id="nap">
+      <div class="panel">
+        <p class="label"><span class="n">1</span>Chọn loại mạch</p>
+        <div class="boards" role="radiogroup" aria-label="Loại mạch">
+          <div>
+            <input type="radio" name="board" id="b-c3" value="c3" checked>
+            <label for="b-c3"><span class="chipicon">C3</span><span><b>ESP32-C3 SuperMini <span class="tag ok">Sẵn sàng</span></b><small>4 MB flash · Mochi đang dùng</small></span></label>
+          </div>
+          <div>
+            <input type="radio" name="board" id="b-s3" value="s3">
+            <label for="b-s3"><span class="chipicon">S3</span><span><b>ESP32-S3 N16R8 <span class="tag warn">Sắp có</span></b><small>16 MB flash · 8 MB PSRAM</small></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="label"><span class="n">3</span>Nạp firmware</p>
+        <div data-board="c3">
+          <esp-web-install-button manifest="manifest-c3.json">
+            <button slot="activate" class="btn">⚡ Nạp Mochi AI</button>
+            <span slot="unsupported" class="warnbox">Trình duyệt này không nạp được: dùng Chrome hoặc Edge trên máy tính.</span>
+            <span slot="not-allowed" class="warnbox">Trang phải mở bằng link https (GitHub Pages) thì mới nạp được.</span>
+          </esp-web-install-button>
+          <div class="fw"><span>Phiên bản <b>22.11.2026</b></span><span>3,4 MB · xiaozhi.me</span></div>
+          <ol class="hint">
+            <li>Cắm Mochi bằng cáp USB-C, tắt Serial Monitor và cầu nối loa nếu đang mở.</li>
+            <li>Bấm nút, chọn <b>USB JTAG/serial debug unit</b>, rồi bấm <b>Connect</b> → <b>Install</b>.</li>
+            <li>Không kết nối được: giữ <b>BOOT</b>, nhấn <b>RST</b>, thả BOOT, rồi thử lại.</li>
+          </ol>
+        </div>
+        <div data-board="s3" class="hidden">
+          <button class="btn" disabled>⚡ Nạp Mochi AI</button>
+          <p class="hint">Chưa có firmware cho S3. Khi có mạch, gửi ảnh hoặc tên mạch để build và thêm vào đây.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="label"><span class="n">4</span>Sau khi nạp</p>
+        <ol>
+          <li>Kết nối điện thoại vào Wi-Fi <code>Xiaozhi-xxxx</code> do Mochi phát, chọn Wi-Fi nhà bạn và nhập mật khẩu.</li>
+          <li>Vào <code>xiaozhi.me</code>, thêm thiết bị bằng mã 6 số hiện trên màn.</li>
+          <li>Gọi <b>"Hi ESP"</b> để bắt đầu nói chuyện.</li>
+        </ol>
+      </div>
+    </aside>
+
+    <!-- ========== right column ========== -->
+    <main class="main" id="daydien">
+      <div class="panel">
+        <div class="mainhead">
+          <h2><span class="label" style="display:inline-flex;margin:0 6px 0 0;vertical-align:2px"><span class="n">2</span></span>Sơ đồ đấu dây <small id="boardName">ESP32-C3 SuperMini</small></h2>
+          <div class="seg" role="tablist">
+            <button class="on" data-view="svg" role="tab" aria-selected="true">Sơ đồ</button>
+            <button data-view="table" role="tab" aria-selected="false">Bảng chân</button>
+          </div>
+        </div>
+
+        <!-- C3 diagram: built from the real component photos (parts.js + diagram.js) -->
+        <div data-board="c3" data-view="svg" class="diagram photo" id="c3photo"></div>
+
+        <!-- S3 diagram -->
+        <div data-board="s3" data-view="svg" class="diagram hidden">
+<svg viewBox="0 0 900 530" xmlns="http://www.w3.org/2000/svg" font-family="Be Vietnam Pro, Segoe UI, sans-serif" font-size="13" role="img" aria-label="Sơ đồ đấu dây ESP32-S3">
+  <g fill="none" stroke-width="3" stroke-linecap="round">
+    <path d="M232 110 H378" stroke="var(--w-data)"/><path d="M232 150 H378" stroke="var(--w-ws)"/><path d="M232 190 H378" stroke="var(--w-clk)"/>
+    <path d="M232 330 H378" stroke="var(--w-data)"/><path d="M232 370 H378" stroke="var(--w-clk)"/><path d="M232 410 H378" stroke="var(--w-ws)"/>
+    <path d="M522 110 H648" stroke="var(--w-touch)"/>
+    <path d="M522 210 H648" stroke="var(--w-disp)"/><path d="M522 250 H648" stroke="var(--w-disp)"/><path d="M522 290 H648" stroke="var(--w-disp)"/>
+    <path d="M522 330 H648" stroke="var(--w-disp)"/><path d="M522 370 H648" stroke="var(--w-disp)"/><path d="M522 410 H648" stroke="var(--w-disp)"/>
+  </g>
+  <rect x="380" y="56" width="140" height="460" rx="14" fill="var(--board)"/>
+  <rect x="425" y="40" width="50" height="26" rx="5" fill="#9aa3b5"/>
+  <text x="450" y="32" text-anchor="middle" fill="var(--muted)" font-size="12">USB</text>
+  <text x="450" y="86" text-anchor="middle" fill="var(--board-text)" font-weight="700">ESP32-S3</text>
+  <g fill="var(--board-text)" font-size="12.5" font-weight="600">
+    <text x="394" y="114">6</text><text x="394" y="154">4</text><text x="394" y="194">5</text>
+    <text x="394" y="334">7</text><text x="394" y="374">15</text><text x="394" y="414">16</text>
+    <text x="506" y="114" text-anchor="end">2</text><text x="506" y="214" text-anchor="end">41</text><text x="506" y="254" text-anchor="end">40</text>
+    <text x="506" y="294" text-anchor="end">45</text><text x="506" y="334" text-anchor="end">47</text><text x="506" y="374" text-anchor="end">21</text>
+    <text x="506" y="414" text-anchor="end">42</text>
+  </g>
+  <g fill="var(--board-text)" opacity=".85" text-anchor="middle">
+    <text x="450" y="466" font-size="12">3V3 · 5V · GND</text>
+    <text x="450" y="486" font-size="11">theo số GPIO,</text><text x="450" y="501" font-size="11">không theo vị trí chân</text>
+  </g>
+  <g stroke="#d9c27a" stroke-width="2" fill="#f4d77a">
+    <circle cx="380" cy="110" r="6"/><circle cx="380" cy="150" r="6"/><circle cx="380" cy="190" r="6"/>
+    <circle cx="380" cy="330" r="6"/><circle cx="380" cy="370" r="6"/><circle cx="380" cy="410" r="6"/>
+    <circle cx="520" cy="110" r="6"/><circle cx="520" cy="210" r="6"/><circle cx="520" cy="250" r="6"/><circle cx="520" cy="290" r="6"/>
+    <circle cx="520" cy="330" r="6"/><circle cx="520" cy="370" r="6"/><circle cx="520" cy="410" r="6"/>
+  </g>
+  <rect x="30" y="70" width="202" height="200" rx="12" fill="var(--module)" stroke="var(--module-stroke)"/>
+  <text x="44" y="94" font-weight="700" fill="var(--text)">INMP441 · mic</text>
+  <g fill="var(--text)" text-anchor="end" font-weight="600"><text x="220" y="114">SD</text><text x="220" y="154">WS</text><text x="220" y="194">SCK</text></g>
+  <g font-size="12.5" font-weight="600"><text x="44" y="218" fill="var(--p33)">VDD ➜ 3V3</text><text x="44" y="238" fill="var(--gnd)">GND ➜ GND</text><text x="44" y="258" fill="var(--gnd)">L/R ➜ GND</text></g>
+  <g fill="var(--text)"><circle cx="232" cy="110" r="5"/><circle cx="232" cy="150" r="5"/><circle cx="232" cy="190" r="5"/></g>
+  <rect x="30" y="292" width="202" height="210" rx="12" fill="var(--module)" stroke="var(--module-stroke)"/>
+  <text x="44" y="316" font-weight="700" fill="var(--text)">MAX98357A · ampli</text>
+  <g fill="var(--text)" text-anchor="end" font-weight="600"><text x="220" y="334">DIN</text><text x="220" y="374">BCLK</text><text x="220" y="414">LRC</text></g>
+  <g font-size="12.5"><text x="44" y="446" fill="var(--p5)" font-weight="600">VIN ➜ 5V</text><text x="44" y="466" fill="var(--gnd)" font-weight="600">GND ➜ GND</text><text x="44" y="488" fill="var(--muted)">Loa 4–8 Ω ➜ + / −</text></g>
+  <g fill="var(--text)"><circle cx="232" cy="330" r="5"/><circle cx="232" cy="370" r="5"/><circle cx="232" cy="410" r="5"/></g>
+  <rect x="648" y="70" width="222" height="76" rx="12" fill="var(--module)" stroke="var(--module-stroke)"/>
+  <text x="664" y="94" font-weight="700" fill="var(--text)">TTP223 · chạm</text>
+  <text x="664" y="128" fill="var(--text)" font-weight="600">I/O</text>
+  <text x="760" y="118" font-size="12" fill="var(--p33)" font-weight="600">VCC ➜ 3V3</text>
+  <text x="760" y="136" font-size="12" fill="var(--gnd)" font-weight="600">GND ➜ GND</text>
+  <circle cx="648" cy="110" r="5" fill="var(--text)"/>
+  <rect x="648" y="166" width="222" height="336" rx="12" fill="var(--module)" stroke="var(--module-stroke)"/>
+  <text x="664" y="190" font-weight="700" fill="var(--text)">ST7735S 0.96" 80×160</text>
+  <g fill="var(--text)" font-weight="600"><text x="664" y="214">CS</text><text x="664" y="254">DC</text><text x="664" y="294">RES</text><text x="664" y="334">SDA</text><text x="664" y="374">SCL</text><text x="664" y="414">BLK</text></g>
+  <g fill="var(--muted)" font-size="12"><text x="712" y="414">đèn nền (tắt được)</text></g>
+  <g font-size="12.5"><text x="664" y="452" fill="var(--p33)" font-weight="600">VCC ➜ 3V3</text><text x="664" y="474" fill="var(--gnd)" font-weight="600">GND ➜ GND</text></g>
+  <g fill="var(--text)"><circle cx="648" cy="210" r="5"/><circle cx="648" cy="250" r="5"/><circle cx="648" cy="290" r="5"/><circle cx="648" cy="330" r="5"/><circle cx="648" cy="370" r="5"/><circle cx="648" cy="410" r="5"/></g>
+</svg>
+        </div>
+
+        <!-- pin tables -->
+        <div data-board="c3" data-view="table" class="hidden">
+          <table>
+            <tr><th>Linh kiện</th><th>Tín hiệu</th><th>Nguồn</th></tr>
+            <tr><td>Màn ST7735S</td><td>CS→6 · DC→7 · RES→8 · SDA→9 · SCL→10</td><td>VCC→3V3 · GND · BLK để trống</td></tr>
+            <tr><td>Mic INMP441</td><td>SD→4 · WS→1 · SCK→2</td><td>VDD→3V3 · GND · L/R→GND</td></tr>
+            <tr><td>Ampli MAX98357A</td><td>LRC→1 · BCLK→2 · DIN→3</td><td>VIN→5V · GND · loa ở + / −</td></tr>
+            <tr><td>Nút chạm TTP223</td><td>I/O→5</td><td>VCC→3V3 · GND</td></tr>
+            <tr><td>Pin 14250 3.7V</td><td>+ → B+ mạch sạc · − → B− mạch sạc</td><td>sạc qua cổng Type-C của mạch sạc</td></tr>
+            <tr><td>Mạch sạc Type-C</td><td>OUT+ → chân giữa công tắc</td><td>OUT− → G (GND) của C3</td></tr>
+            <tr><td>Công tắc gạt</td><td>chân bên → 5V của C3</td><td>chân còn lại để trống</td></tr>
+          </table>
+        </div>
+        <div data-board="s3" data-view="table" class="hidden">
+          <table>
+            <tr><th>Linh kiện</th><th>Tín hiệu</th><th>Nguồn</th></tr>
+            <tr><td>Màn ST7735S</td><td>CS→41 · DC→40 · RES→45 · SDA→47 · SCL→21 · BLK→42</td><td>VCC→3V3 · GND</td></tr>
+            <tr><td>Mic INMP441</td><td>SD→6 · WS→4 · SCK→5</td><td>VDD→3V3 · GND · L/R→GND</td></tr>
+            <tr><td>Ampli MAX98357A</td><td>DIN→7 · BCLK→15 · LRC→16</td><td>VIN→5V · GND · loa ở + / −</td></tr>
+            <tr><td>Nút chạm TTP223</td><td>I/O→2</td><td>VCC→3V3 · GND</td></tr>
+          </table>
+        </div>
+
+        <div class="legend">
+          <span><i style="background:var(--w-disp)"></i>Màn hình</span>
+          <span><i style="background:var(--w-ws)"></i>WS / LRC</span>
+          <span><i style="background:var(--w-clk)"></i>SCK / BCLK</span>
+          <span><i style="background:var(--w-data)"></i>Dữ liệu âm thanh</span>
+          <span><i style="background:var(--w-touch)"></i>Nút chạm</span>
+          <span><i style="background:var(--p33)"></i>3V3</span>
+          <span><i style="background:var(--p5)"></i>5V</span>
+        </div>
+      </div>
+
+      <div class="notes" id="luuy">
+        <div class="note" data-board="c3"><b>Dùng chung dây</b>Mic và ampli dùng chung chân 1 (WS/LRC) và chân 2 (SCK/BCLK).</div>
+        <div class="note" data-board="c3"><b>Chạy bằng pin</b>Pin 3.7V vào chân 5V vẫn chạy được (mạch tự hạ xuống 3.3V). <b style="display:inline">Gạt công tắc OFF khi cắm USB vào ESP32 để nạp code.</b> Sạc pin thì cắm vào cổng Type-C của mạch sạc.</div>
+        <div class="note" data-board="c3"><b>Cẩn thận GPIO8</b>Chỉ cắm chân RES của màn vào GPIO8. Cắm nhầm dây khác vào là màn sẽ tắt.</div>
+        <div class="note" data-board="s3"><b>Dây riêng</b>Trên S3, mic và ampli đi dây riêng, không chung chân như C3.</div>
+        <div class="note" data-board="s3"><b>Tránh GPIO 35–37</b>Trên mạch N16R8, ba chân này đã nối với PSRAM.</div>
+        <div class="note"><b>Dò số trên mạch</b>Thứ tự chân trong hình có thể khác mạch thật. Luôn đối chiếu số in trên mạch.</div>
+      </div>
+    </main>
+  </div>
+</div>
+<footer>NGUYENNAM.mochiai · Mochi AI chạy trên firmware xiaozhi-esp32</footer>
+
+<script src="parts.js"></script>
+<script src="diagram.js"></script>
+<script>
+const names = { c3: 'ESP32-C3 SuperMini', s3: 'ESP32-S3 N16R8' };
+let board = 'c3', view = 'svg';
+function render() {
+  document.querySelectorAll('[data-board]').forEach(el => {
+    const okBoard = el.dataset.board === board;
+    const okView = !el.dataset.view || el.dataset.view === view;
+    el.classList.toggle('hidden', !(okBoard && okView));
+  });
+  document.getElementById('boardName').textContent = names[board];
+  document.querySelectorAll('.seg button').forEach(b => {
+    const on = b.dataset.view === view;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-selected', on);
+  });
+}
+document.querySelectorAll('input[name=board]').forEach(r => r.addEventListener('change', () => {
+  board = r.value;
+  try { localStorage.setItem('mochi-board', board); } catch (e) {}
+  render();
+}));
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => { view = b.dataset.view; render(); }));
+try {
+  const saved = localStorage.getItem('mochi-board');
+  if (saved && names[saved]) { board = saved; document.getElementById('b-' + saved).checked = true; }
+} catch (e) {}
+render();
+
+const ok = 'serial' in navigator && window.isSecureContext;
+const chip = document.getElementById('envChip');
+chip.classList.toggle('bad', !ok);
+document.getElementById('envText').innerHTML = ok
+  ? 'Sẵn sàng nạp<span class="long"> · Web Serial</span>'
+  : 'Không nạp được<span class="long">: dùng Chrome hoặc Edge trên máy tính</span>';
+
+// highlight the nav item of the section in view
+const links = [...document.querySelectorAll('nav a')];
+addEventListener('scroll', () => {
+  let cur = links[0];
+  for (const a of links) {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t && t.getBoundingClientRect().top < 140) cur = a;
+  }
+  links.forEach(a => a.classList.toggle('active', a === cur));
+}, { passive: true });
+</script>
+</body>
+</html>

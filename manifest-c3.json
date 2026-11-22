@@ -1,0 +1,11 @@
+{
+  "name": "Mochi AI (ESP32-C3 SuperMini)",
+  "version": "2026.11.22",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [{ "path": "firmware/mochi_c3_full.bin", "offset": 0 }]
+    }
+  ]
+}
