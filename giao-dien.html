@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084 https://geocoding-api.open-meteo.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Giao diện Mochi · Mochi AI Lab</title>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -13,8 +14,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261128">
-<link rel="stylesheet" href="mochi-panel.css?v=20261128">
+<link rel="stylesheet" href="site.css?v=20261133">
+<link rel="stylesheet" href="mochi-panel.css?v=20261134">
 </head>
 <body>
 <header data-active="look"></header>
@@ -26,9 +27,10 @@
   <div class="card">
     <label class="lbl" for="code">Mã của Mochi</label>
     <div class="codebox" style="margin-top:8px">
-      <input id="code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
+      <input id="code" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH-JKMN">
       <button class="primary" id="btnConnect">Kết nối</button>
     </div>
+    <label class="remember"><input type="checkbox" id="remember" checked> Ghi nhớ mã trên máy này <small>(bỏ chọn khi dùng máy người khác: mã mất khi đóng tab)</small></label>
     <div class="status" id="status"><i></i><div><b id="stTitle">Chưa kết nối</b><small id="stSub">Xem mã trên Mochi: giữ nút chạm 2 giây, chạm tới mục Code web (<a href="cai-dat.html#doi-ma">hướng dẫn</a>)</small></div></div>
   </div>
 
@@ -75,14 +77,17 @@
   <div class="card">
     <h2><span>🌙</span>Ngủ & giật mình</h2>
     <div class="row">
-      <span class="lbl">Ngủ đêm</span>
+      <span class="lbl grow">Ngủ đêm<br><span class="muted" style="font-weight:400">Ban đêm Mochi tự ngủ, màn tối</span></span>
+      <label class="switch"><input type="checkbox" id="bedOn" aria-label="Ngủ đêm"><span></span></label>
+    </div>
+    <div class="row" id="bedHours">
+      <span class="lbl">Giờ ngủ</span>
       <select id="bedS" aria-label="Giờ đi ngủ"></select> <span class="muted">đến</span> <select id="bedE" aria-label="Giờ dậy"></select>
       <button id="bedSave">Lưu</button>
     </div>
-    <p class="note" style="margin:6px 0 0">Ban đêm Mochi tự ngủ, màn tối. Chọn hai giờ giống nhau để tắt ngủ đêm.</p>
     <div class="row">
-      <button class="grow" data-cmd="sleep">😴 Cho Mochi ngủ</button>
-      <button class="grow" data-cmd="wake">☀️ Đánh thức</button>
+      <span class="lbl grow">Ngủ ngay<br><span class="muted" style="font-weight:400">Tắt để đánh thức Mochi</span></span>
+      <label class="switch"><input type="checkbox" id="sleepNow" aria-label="Ngủ ngay"><span></span></label>
     </div>
     <div class="row">
       <span class="lbl">Giật mình khi có tiếng động to</span>
@@ -91,13 +96,13 @@
   </div>
   </fieldset>
 
-  <p class="note">Lệnh đi qua máy chủ nhắn tin công cộng (broker.emqx.io). Ai biết mã của Mochi cũng điều khiển được Mochi, kể cả khởi động lại, nên đừng chia sẻ mã.</p>
+  <p class="note">🔒 Lệnh và trạng thái được <b>mã hoá đầu-cuối</b> bằng mã của Mochi trước khi đi qua máy chủ nhắn tin công cộng (broker.emqx.io): máy chủ và người lạ chỉ thấy dữ liệu đã khoá, không đọc hay giả được lệnh. Mã chỉ hiện trên màn Mochi và lưu trong trình duyệt này, không bao giờ được gửi lên mạng. Ai biết mã thì điều khiển được Mochi, nên đừng chia sẻ mã.</p>
 </main>
 <footer></footer>
 <div class="toast" id="toast"></div>
 
 <script src="site.js?v=20261128"></script>
-<script src="mochi-link.js?v=20261128"></script>
-<script src="mochi-panel.js?v=20261129"></script>
+<script src="mochi-link.js?v=20261133"></script>
+<script src="mochi-panel.js?v=20261135"></script>
 </body>
 </html>

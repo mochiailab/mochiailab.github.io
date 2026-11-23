@@ -10,7 +10,7 @@ Trang web của Mochi: nạp firmware **Mochi AI** ngay trên trình duyệt, s�
 | `nap-firmware.html` | Mục **Nạp firmware** trên menu: chỉ các thẻ mạch |
 | `esp32-c3.html` | ESP32-C3 + ST7735S 0.96": nút nạp, sơ đồ **Loại 1 – có pin** / **Loại 2 – không pin**, bảng chân, lưu ý |
 | `esp32-s3.html` | ESP32-S3 N16R8 (sắp có): sơ đồ dự kiến |
-| `nhan-chu.html` | Nhắn chữ lên Mochi qua Wi-Fi (MQTT qua `broker.emqx.io`), giao diện Mochi + chữ hoặc Màu nền + chữ to |
+| `nhan-chu.html` | Nhắn chữ lên Mochi qua Wi-Fi (MQTT qua `broker.emqx.io`, mã hoá đầu-cuối AES-GCM bằng mã 12 ký tự của Mochi), giao diện Mochi + chữ hoặc Màu nền + chữ to |
 | `giao-dien.html` | Giao diện Mochi: màu thân, chế độ / kiểu / màu nền đồng hồ, thời tiết, giờ ngủ, giật mình |
 | `cai-dat.html` | Cài đặt Mochi: âm lượng, hẹn giờ, cài lại Wi-Fi, khởi động lại, **cập nhật firmware qua Wi-Fi**, hướng dẫn đổi mã |
 

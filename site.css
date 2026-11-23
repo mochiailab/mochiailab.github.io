@@ -109,3 +109,10 @@ a.card:hover, .card.link:hover { transform: translateY(-2px); border-color: colo
 
 footer { text-align: center; color: var(--muted); font-size: 13px; padding: 10px 16px 24px; }
 footer a { color: inherit; }
+
+/* "Ghi nhớ mã" checkbox under the key box (Nhắn chữ, Giao diện, Cài đặt) */
+.remember { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin: 10px 2px 0; font-size: 14px; color: var(--text); cursor: pointer; }
+.remember input { accent-color: var(--accent); }
+.remember small { color: var(--muted); }
+
+[hidden] { display: none !important; }

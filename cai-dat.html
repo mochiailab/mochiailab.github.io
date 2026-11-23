@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084 https://geocoding-api.open-meteo.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cài đặt Mochi · Mochi AI Lab</title>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -13,8 +14,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261128">
-<link rel="stylesheet" href="mochi-panel.css?v=20261128">
+<link rel="stylesheet" href="site.css?v=20261133">
+<link rel="stylesheet" href="mochi-panel.css?v=20261134">
 </head>
 <body>
 <header data-active="settings"></header>
@@ -26,10 +27,17 @@
   <div class="card">
     <label class="lbl" for="code">Mã của Mochi</label>
     <div class="codebox" style="margin-top:8px">
-      <input id="code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
+      <input id="code" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH-JKMN">
       <button class="primary" id="btnConnect">Kết nối</button>
     </div>
+    <label class="remember"><input type="checkbox" id="remember" checked> Ghi nhớ mã trên máy này <small>(bỏ chọn khi dùng máy người khác: mã mất khi đóng tab)</small></label>
     <div class="status" id="status"><i></i><div><b id="stTitle">Chưa kết nối</b><small id="stSub">Xem mã trên Mochi: giữ nút chạm 2 giây, chạm tới mục Code web (<a href="#doi-ma">hướng dẫn</a>)</small></div></div>
+  </div>
+
+  <div class="card" id="oldFw" hidden>
+    <h2><span>🔒</span>Mochi đang chạy firmware cũ</h2>
+    <p class="note" style="margin:0 0 10px">Mã 6 ký tự là của firmware cũ, chưa mã hoá. Bấm <b>Cập nhật</b> để Mochi tự tải bản mới qua Wi-Fi: khoảng 1 phút, giữ nguyên Wi-Fi và cài đặt. Xong, Mochi có <b>mã mới 12 ký tự</b> (menu, mục Code web): nhập mã mới ở ô trên.</p>
+    <div class="row"><span class="grow" id="oldFwInfo">Đang chờ Mochi…</span><button class="primary" id="oldFwBtn" disabled>⬆ Cập nhật lên bản mã hoá</button></div>
   </div>
 
   <fieldset id="controls" disabled>
@@ -67,7 +75,7 @@
     <h2><span>⚙️</span>Hệ thống</h2>
     <div class="update" id="upd">
       <div class="grow"><b id="updTitle">Phiên bản Mochi: –</b><small id="updSub">Đang kiểm tra bản mới nhất…</small></div>
-      <button class="primary" id="updBtn" disabled>⬆ Cập nhật qua Wi-Fi</button>
+      <button class="primary" id="updBtn" hidden disabled>⬆ Cập nhật</button>
     </div>
     <div class="row">
       <button class="grow" id="wifi">📶 Cài lại Wi-Fi</button>
@@ -79,25 +87,25 @@
 
   <div class="card" id="doi-ma">
     <h2><span>🔑</span>Xem và đổi mã của Mochi</h2>
-    <p class="note" style="margin:0 0 10px">Mã 6 ký tự là "chìa khoá" để nhắn chữ và điều khiển Mochi. Ai biết mã cũng điều khiển được, nên nếu lỡ để lộ, hãy đổi mã mới ngay trên Mochi.</p>
+    <p class="note" style="margin:0 0 10px">Mã 12 ký tự (dạng <code>ABCD-EFGH-JKMN</code>) là "chìa khoá" để nhắn chữ và điều khiển Mochi. Ai biết mã cũng điều khiển được, nên nếu lỡ để lộ, hãy đổi mã mới ngay trên Mochi.</p>
     <ol class="steps">
       <li><b>Mở menu:</b> giữ nút chạm trên Mochi khoảng 2 giây.</li>
-      <li><b>Tới mục Code web:</b> chạm nhẹ từng lần cho tới khi màn hiện <code>Code web: ABC123</code>. Đây là mã hiện tại.</li>
+      <li><b>Tới mục Code web:</b> chạm nhẹ từng lần cho tới khi màn hiện <code>Code web</code> và một mã dạng <code>ABCD-EFGH-JKMN</code>. Đây là mã hiện tại.</li>
       <li><b>Bắt đầu đổi:</b> ở mục đó giữ nút chạm 2 giây. Màn hỏi <code>Tạo code mới?</code></li>
-      <li><b>Xác nhận:</b> giữ thêm 2 giây nữa (trong vòng 10 giây). Màn hiện <code>Code web mới: XXXXXX</code> khoảng 15 giây, hãy ghi lại.</li>
+      <li><b>Xác nhận:</b> giữ thêm 2 giây nữa (trong vòng 10 giây). Màn hiện <code>Code web mới</code> kèm mã mới khoảng 15 giây, hãy ghi lại.</li>
       <li><b>Dùng mã mới:</b> trên trang này hoặc trang Nhắn chữ, bấm <b>Đổi mã</b> và nhập mã mới.</li>
     </ol>
     <p class="note" style="margin:10px 0 0">Mã cũ hết dùng ngay lập tức. Mã mới chỉ hiện trên màn Mochi, không bao giờ được gửi qua mạng, nên người đang giữ mã cũ không thể biết. Lỡ giữ nhầm? Chạm sang mục khác hoặc chờ 10 giây là không đổi.</p>
   </div>
 
 
-  <p class="note">Lệnh đi qua máy chủ nhắn tin công cộng (broker.emqx.io). Ai biết mã của Mochi cũng điều khiển được Mochi, kể cả khởi động lại, nên đừng chia sẻ mã.</p>
+  <p class="note">🔒 Lệnh và trạng thái được <b>mã hoá đầu-cuối</b> bằng mã của Mochi trước khi đi qua máy chủ nhắn tin công cộng (broker.emqx.io): máy chủ và người lạ chỉ thấy dữ liệu đã khoá, không đọc hay giả được lệnh. Mã chỉ hiện trên màn Mochi và lưu trong trình duyệt này, không bao giờ được gửi lên mạng. Ai biết mã thì điều khiển được Mochi, nên đừng chia sẻ mã.</p>
 </main>
 <footer></footer>
 <div class="toast" id="toast"></div>
 
 <script src="site.js?v=20261128"></script>
-<script src="mochi-link.js?v=20261128"></script>
-<script src="mochi-panel.js?v=20261129"></script>
+<script src="mochi-link.js?v=20261133"></script>
+<script src="mochi-panel.js?v=20261135"></script>
 </body>
 </html>

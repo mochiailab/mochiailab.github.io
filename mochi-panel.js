@@ -2,7 +2,7 @@
 // Each page holds only the cards it shows; this wires whatever is there.
 // Commands / state must match OnRemoteCommand / StateJson in the firmware (mochi_c3_board.cc).
 (function () {
-const { Mqtt, BROKER, CODE_RE, topic } = window.MochiLink;
+const { Link, OldLink, KEY_RE, OLD_CODE_RE, normKey, prettyKey } = window.MochiLink;
 // clock backgrounds, same order as kClockBgs in mochi_display.h (0 = Mochi's own colour)
 const CLOCK_BGS = [['Theo màu Mochi', ''], ['Đen', '#000000'], ['Xanh trời', '#c4e2fc', 1], ['Tím nhạt', '#ded0fc', 1],
   ['Bạc hà', '#c6f2d8', 1], ['Cam đào', '#ffd8c8', 1], ['Vàng chanh', '#fcf0aa', 1], ['Hồng phấn', '#ffd2e4', 1],
@@ -21,14 +21,14 @@ function setStatus(kind, title, sub) {
   $('status').className = 'status ' + kind; $('stTitle').textContent = title; $('stSub').textContent = sub;
 }
 function refreshStatus() {
-  const ready = !!(mq && mq.ready);
+  const ready = !!(mq && mq.connected);
   $('btnConnect').textContent = ready ? 'Đổi mã' : 'Kết nối';
   $('controls').disabled = !(ready && online && gotState);
   if (!ready) return;
   if (online === false) setStatus('off', 'Mochi đang tắt hoặc mất mạng', 'Bật Mochi rồi thử lại');
-  else if (online && gotState) setStatus('on', 'Mochi đang trực tuyến', 'Mã ' + code + ' · sẵn sàng');
+  else if (online && gotState) setStatus('on', 'Mochi đang trực tuyến', 'Mã ' + prettyKey(code) + ' · sẵn sàng');
   else if (online) setStatus('busy', 'Mochi trực tuyến, chưa có cài đặt', 'Firmware cũ chưa hỗ trợ trang này: nạp bản mới ở mục Nạp firmware');
-  else setStatus('busy', 'Đã kết nối máy chủ', 'Chưa thấy Mochi mã ' + code + '. Kiểm tra mã hoặc chờ Mochi khởi động xong');
+  else setStatus('busy', 'Đã kết nối máy chủ', 'Chưa thấy Mochi mã ' + prettyKey(code) + '. Kiểm tra mã hoặc chờ Mochi khởi động xong');
 }
 
 // ---------- controls from the state Mochi publishes ----------
@@ -76,7 +76,10 @@ function render() {
   document.querySelectorAll('#colors button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.color));
   $('clock').checked = state.clock === 1;
   $('volume').value = state.volume; $('volVal').textContent = state.volume + '%';
-  $('bedS').value = state.bed_s; $('bedE').value = state.bed_e;
+  const bedOn = state.bed_s !== state.bed_e;
+  $('bedOn').checked = bedOn; $('bedHours').hidden = !bedOn;
+  if (bedOn) { $('bedS').value = state.bed_s; $('bedE').value = state.bed_e; }
+  $('sleepNow').checked = !!state.sleep;
   document.querySelectorAll('#startle button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.startle));
   const t = state.timer;
   $('timerLeft').textContent = t > 0 ? 'Còn ' + Math.floor(t / 60) + ' phút ' + String(t % 60).padStart(2, '0') + ' giây' : 'Không có hẹn giờ';
@@ -86,30 +89,71 @@ function render() {
 
 function send(cmd, extra) {
   if (!mq || !mq.ready) return false;
-  mq.publish(topic(code, 'cmd'), JSON.stringify(Object.assign({ cmd }, extra || {})));
-  return true;
+  return mq.send('cmd', JSON.stringify(Object.assign({ cmd }, extra || {})));
 }
 const DONE = { weather_refresh: 'Mochi đang lấy thời tiết…', text_off: 'Đã tắt chạy chữ', pet: 'Mochi được thả tim 💗', clock_show: 'Mochi đang hiện giờ', sleep: 'Mochi sẽ đi ngủ', wake: 'Đã đánh thức Mochi' };
 
+// A 6-letter code = firmware before the encrypted link: only offer the update to it.
+// The box is on the Cài đặt page; the other pages point there.
+function connectOld(c) {
+  if (mq) mq.close();
+  code = c; online = null; state = null; gotState = false;
+  window.MochiLink.saveCode(c);
+  $('controls').disabled = true;
+  const box = document.getElementById('oldFw');
+  if (box) box.hidden = false;
+  let st = null;
+  const show = () => {
+    if (!mq || !mq.connected) return;
+    if (online === false) setStatus('off', 'Mochi đang tắt hoặc mất mạng', 'Bật Mochi rồi thử lại');
+    else setStatus('busy', 'Mochi đang chạy firmware cũ (mã 6 ký tự)',
+      box ? 'Cập nhật lên bản mã hoá ở ô bên dưới' : 'Vào trang Cài đặt để cập nhật lên bản mã hoá');
+    if (!box || $('oldFwBtn').dataset.sent) return;
+    $('oldFwBtn').disabled = !(online && st && st.updater === 1);
+    $('oldFwInfo').textContent = !st ? 'Đang chờ Mochi…'
+      : st.updater === 1 ? 'Phiên bản Mochi: ' + (st.mfw || 'cũ') + ' · có thể cập nhật qua Wi-Fi'
+      : 'Mochi này chưa có bộ cập nhật qua Wi-Fi: nạp lại bằng cáp USB ở trang Nạp firmware.';
+  };
+  setStatus('busy', 'Đang kết nối…', 'Tới máy chủ nhắn tin');
+  mq = new OldLink(c, (leaf, payload) => {
+    if (leaf === 'status') online = payload === 'online';
+    else if (leaf === 'state') { try { st = JSON.parse(payload); } catch (e) {} }
+    show();
+  }, (s) => {
+    if (s === 'ready') { setStatus('busy', 'Đã kết nối máy chủ', 'Chưa thấy Mochi mã ' + c + '. Kiểm tra mã hoặc chờ Mochi khởi động xong'); show(); }
+    else setStatus('', 'Mất kết nối', 'Bấm Kết nối để thử lại');
+    $('btnConnect').textContent = mq && mq.connected ? 'Đổi mã' : 'Kết nối';
+  });
+  mq.open();
+}
+$('oldFwBtn').addEventListener('click', () => {
+  if (!mq || !mq.update || !mq.update()) return;
+  $('oldFwBtn').disabled = true; $('oldFwBtn').dataset.sent = '1';
+  $('oldFwInfo').textContent = 'Mochi đang cập nhật (khoảng 1 phút, màn hiện thanh tiến trình). Xong, mở menu trên Mochi, mục Code web, rồi nhập mã mới 12 ký tự ở ô trên.';
+  toast('Đã gửi lệnh cập nhật');
+});
+
 function connect() {
-  const c = $('code').value.trim().toUpperCase();
-  if (!CODE_RE.test(c)) { toast('Mã gồm 6 chữ/số, xem trong menu của Mochi'); $('code').focus(); return; }
+  const c = normKey($('code').value);
+  if (OLD_CODE_RE.test(c)) { connectOld(c); return; }
+  const box = document.getElementById('oldFw');
+  if (box) box.hidden = true;
+  if (!KEY_RE.test(c)) { toast('Mã gồm 12 chữ/số, xem trong menu của Mochi (mục Code web)'); $('code').focus(); return; }
   if (mq) mq.close();
   code = c; online = null; state = null; gotState = false;
   window.MochiLink.saveCode(code);
   setStatus('busy', 'Đang kết nối…', 'Tới máy chủ nhắn tin');
-  mq = new Mqtt(BROKER, window.MochiLink.clientId(), (tp, payload) => {
-    if (tp.endsWith('/status')) online = payload === 'online';
-    else if (tp.endsWith('/state')) {
+  mq = new Link(code, (leaf, payload) => {
+    if (leaf === 'status') online = payload === 'online';
+    else if (leaf === 'state') {
       try { state = JSON.parse(payload); gotState = true; render(); } catch (e) {}
     }
     refreshStatus();
   }, (st) => {
     if (st === 'ready') {
-      mq.subscribe(topic(code, 'status'));
-      mq.subscribe(topic(code, 'state'));
       setTimeout(refreshStatus, 2500);
-    } else if (st === 'closed') setStatus('', 'Mất kết nối', 'Bấm Kết nối để thử lại');
+    } else if (st === 'nocrypto') setStatus('', 'Trình duyệt không hỗ trợ mã hoá', 'Mở trang bằng Chrome, Safari hoặc Edge bản mới');
+    else if (st === 'closed') setStatus('', 'Mất kết nối', 'Bấm Kết nối để thử lại');
     else setStatus('', 'Máy chủ từ chối kết nối', 'Thử lại sau ít phút');
     refreshStatus();
   });
@@ -141,9 +185,33 @@ $('volume').addEventListener('change', () => { if (send('volume', { v: +$('volum
 for (const id of ['bedS', 'bedE']) {
   $(id).innerHTML = Array.from({ length: 24 }, (_, h) => `<option value="${h}">${String(h).padStart(2, '0')}:00</option>`).join('');
 }
+// night sleep: the firmware keeps start == end for "off", so the switch remembers the hours here
+const BED_KEY = 'mochiBedHours';
+function lastBedHours() {
+  try { const h = JSON.parse(localStorage.getItem(BED_KEY)); if (h && h[0] !== h[1]) return h; } catch (e) {}
+  return [22, 7];
+}
+function sendBed(s, e) {
+  if (s !== e) { try { localStorage.setItem(BED_KEY, JSON.stringify([s, e])); } catch (err) {} }
+  return send('bed', { start: s, end: e });
+}
 $('bedSave').addEventListener('click', () => {
   const s = +$('bedS').value, e = +$('bedE').value;
-  if (send('bed', { start: s, end: e })) toast(s === e ? 'Đã tắt ngủ đêm' : 'Ngủ từ ' + s + ':00 đến ' + e + ':00');
+  if (s === e) { toast('Chọn giờ ngủ và giờ dậy khác nhau'); return; }
+  if (sendBed(s, e)) toast('Ngủ từ ' + s + ':00 đến ' + e + ':00');
+});
+$('bedOn').addEventListener('change', () => {
+  const on = $('bedOn').checked;
+  const [s, e] = on ? lastBedHours() : [0, 0];
+  if (!sendBed(s, e)) { $('bedOn').checked = !on; return; }
+  $('bedHours').hidden = !on;
+  if (on) { $('bedS').value = s; $('bedE').value = e; }
+  toast(on ? 'Đã bật ngủ đêm: ' + s + ':00 đến ' + e + ':00' : 'Đã tắt ngủ đêm');
+});
+$('sleepNow').addEventListener('change', () => {
+  const on = $('sleepNow').checked;
+  if (send(on ? 'sleep' : 'wake')) toast(on ? 'Mochi sẽ đi ngủ' : 'Đã đánh thức Mochi');
+  else $('sleepNow').checked = !on;
 });
 $('startle').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return;
@@ -157,6 +225,13 @@ $('wifi').addEventListener('click', () => {
 // the latest version is the one the web flasher serves (firmware/manifest-c3.json)
 let latest = null, updating = null, updStart = 0;
 fetch('manifest-c3.json', { cache: 'no-store' }).then((r) => r.json()).then((m) => { latest = m.version; renderUpdate(); }).catch(() => {});
+// "2026.11.24-7" -> compares as numbers part by part (an empty / old version is the oldest)
+function cmpVersion(a, b) {
+  const p = (v) => String(v || '').split(/[.-]/).map((x) => parseInt(x, 10) || 0);
+  const x = p(a), y = p(b);
+  for (let i = 0; i < Math.max(x.length, y.length); i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0);
+  return 0;
+}
 function renderUpdate() {
   if (!state) return;
   const cur = state.mfw || '';
@@ -169,13 +244,15 @@ function renderUpdate() {
   }
   let sub, can = false;
   if (updating) sub = 'Mochi đang tải bản mới, màn hiện thanh tiến độ. Khoảng 1–2 phút, đừng rút điện.';
-  else if (!state.updater) sub = 'Mochi này chưa có bộ cập nhật qua Wi-Fi: nạp lại bằng cáp USB một lần ở trang Nạp firmware.';
   else if (!latest) sub = 'Không đọc được bản mới nhất trên web.';
-  else if (latest === cur) { sub = 'Đang là bản mới nhất. Có thể cài lại nếu cần.'; can = true; }
-  else { sub = 'Có bản mới: ' + latest; can = true; }
+  else if (cmpVersion(cur, latest) >= 0) sub = cur === latest ? '✓ Đang là bản mới nhất' : '✓ Mới hơn bản trên web (' + latest + ')';
+  else if (!state.updater) sub = 'Có bản mới ' + latest + ', nhưng Mochi này chưa có bộ cập nhật qua Wi-Fi: nạp lại bằng cáp USB một lần ở trang Nạp firmware.';
+  else { sub = '🎉 Có bản mới: ' + latest; can = true; }
   $('updSub').textContent = sub;
+  $('upd').classList.toggle('new', can);
+  $('updBtn').hidden = !can && !updating;  // the button only appears when there is a newer version
   $('updBtn').disabled = !can || !!updating;
-  $('updBtn').textContent = latest && latest === cur ? '↻ Cài lại' : '⬆ Cập nhật qua Wi-Fi';
+  $('updBtn').textContent = '⬆ Cập nhật lên ' + (latest || 'bản mới');
 }
 $('updBtn').addEventListener('click', () => {
   if (!confirm('Mochi sẽ khởi động lại, tải bản ' + (latest || 'mới nhất') + ' qua Wi-Fi (khoảng 1–2 phút) rồi tự quay lại. ' +
@@ -234,8 +311,9 @@ $('wxCity').addEventListener('keydown', (e) => { if (e.key === 'Enter') findCity
 
 $('btnConnect').addEventListener('click', connect);
 $('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
-$('code').addEventListener('input', () => { $('code').value = $('code').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+window.MochiLink.keyInput($('code'));
 const saved = window.MochiLink.savedCode();
-if (saved) { $('code').value = saved; connect(); }
+if (KEY_RE.test(saved)) { $('code').value = prettyKey(saved); connect(); }
+else if (OLD_CODE_RE.test(saved)) { $('code').value = saved; connect(); }
 
 })();
