@@ -11,9 +11,10 @@ Trang web của Mochi: nạp firmware **Mochi AI** ngay trên trình duyệt, s�
 | `esp32-c3.html` | ESP32-C3 + ST7735S 0.96": nút nạp, sơ đồ **Loại 1 – có pin** / **Loại 2 – không pin**, bảng chân, lưu ý |
 | `esp32-s3.html` | ESP32-S3 N16R8 (sắp có): sơ đồ dự kiến |
 | `nhan-chu.html` | Nhắn chữ lên Mochi qua Wi-Fi (MQTT qua `broker.emqx.io`), giao diện Mochi + chữ hoặc Màu nền + chữ to |
-| `cai-dat.html` | Cài đặt Mochi từ xa: màu thân, đồng hồ, hẹn giờ, âm lượng, giờ ngủ, giật mình, cài lại Wi-Fi, khởi động lại; hướng dẫn đổi mã |
+| `giao-dien.html` | Giao diện Mochi: màu thân, chế độ / kiểu / màu nền đồng hồ, thời tiết, giờ ngủ, giật mình |
+| `cai-dat.html` | Cài đặt Mochi: âm lượng, hẹn giờ, cài lại Wi-Fi, khởi động lại, **cập nhật firmware qua Wi-Fi**, hướng dẫn đổi mã |
 
-Dùng chung: `site.css` (màu sáng/tối, thanh menu, thẻ, bố cục), `site.js` (logo, menu và chân trang; thêm trang vào menu ở mảng `MENU`), `cards.js` (danh sách thẻ mạch `BOARDS` và tính năng `FEATURES`), `mochi-link.js` (kết nối MQTT tới Mochi, dùng chung cho Nhắn chữ và Cài đặt; mã của Mochi lưu chung).
+Dùng chung: `site.css` (màu sáng/tối, thanh menu, thẻ, bố cục), `site.js` (logo, menu và chân trang; thêm trang vào menu ở mảng `MENU`), `cards.js` (danh sách thẻ mạch `BOARDS` và tính năng `FEATURES`), `mochi-link.js` (kết nối MQTT tới Mochi, mã lưu chung), `mochi-panel.js` / `mochi-panel.css` (nút điều khiển của trang Giao diện và Cài đặt).
 Sơ đồ C3: `parts.js` (ảnh linh kiện + toạ độ chân) và `diagram.js` (`MochiC3Diagram.show(1 | 2)`).
 
 Thêm mạch hoặc tính năng mới: tạo trang mới, thêm một mục vào `BOARDS` hoặc `FEATURES` trong `cards.js` (trang chủ và trang Nạp firmware tự cập nhật), và (nếu cần) một dòng trong `MENU` của `site.js`.
@@ -24,5 +25,5 @@ Mở trang bằng **Chrome hoặc Edge trên máy tính**, cắm Mochi bằng US
 
 ## Cập nhật firmware
 
-Thay `firmware/mochi_c3_full.bin`, sửa `version` trong `manifest-c3.json` và dòng "Phiên bản" trong `esp32-c3.html`, rồi commit và push.
+Tăng `MOCHI_FW_VERSION` trong firmware, chạy `tools/release_firmware.ps1 -Version <bản mới>` (tạo `firmware/mochi_c3_full.bin` cho nạp USB và `firmware/mochi_c3_app.bin` cho cập nhật qua Wi-Fi, sửa `manifest-c3.json`), sửa dòng "Phiên bản" trong `esp32-c3.html`, rồi commit và push. Mochi có bộ cập nhật sẽ thấy bản mới trên trang Cài đặt.
 Khi sửa `site.css`, `site.js`, `cards.js`, `mochi-link.js`, `parts.js` hoặc `diagram.js`, đổi luôn số `?v=` ở chỗ các trang gọi file đó để trình duyệt không dùng bản cũ.

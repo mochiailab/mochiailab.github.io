@@ -20,13 +20,18 @@
   ];
   const FEATURES = [
     {
+      icon: '🎨', feature: true, title: 'Giao diện Mochi', sub: 'Màu, đồng hồ, thời tiết',
+      text: 'Đổi màu Mochi, bật đồng hồ, chọn kiểu và màu nền đồng hồ, xem thời tiết, giờ ngủ.',
+      href: 'giao-dien.html', go: 'Mở ›',
+    },
+    {
       icon: '✉', feature: true, title: 'Nhắn chữ lên Mochi', sub: 'Qua Wi-Fi, gửi từ bất cứ đâu',
       text: 'Gõ một câu cho chữ chạy dưới mặt Mochi, hoặc chữ to trên nền màu bạn chọn.',
       href: 'nhan-chu.html', go: 'Mở ›',
     },
     {
       icon: '⚙', feature: true, title: 'Cài đặt Mochi', sub: 'Điều khiển từ xa qua Wi-Fi',
-      text: 'Đổi màu, bật đồng hồ, hẹn giờ, âm lượng, giờ ngủ, cài lại Wi-Fi, khởi động lại.',
+      text: 'Âm lượng, hẹn giờ, cài lại Wi-Fi, khởi động lại, đổi mã của Mochi.',
       href: 'cai-dat.html', go: 'Mở ›',
     },
   ];

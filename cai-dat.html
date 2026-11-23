@@ -13,77 +13,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261126">
-<style>
-body { font-size: 16px; }
-main { max-width: 620px; margin: 0 auto; padding: 22px 16px 40px; }
-h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: -.5px; line-height: 1.25; }
-h1 b { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.lead { margin: 0 0 18px; color: var(--muted); }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
-.card h2 { margin: 0 0 12px; font-size: 17px; display: flex; align-items: center; gap: 8px; }
-.card h2 span { font-size: 20px; }
-.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.row + .row { margin-top: 12px; }
-.row .grow { flex: 1; }
-.lbl { font-weight: 700; min-width: 110px; }
-.muted { color: var(--muted); font-size: 14px; }
-
-button { font: inherit; font-weight: 700; border: 0; border-radius: 12px; padding: 10px 14px; cursor: pointer; color: var(--text);
-  background: var(--surface-solid); border: 1px solid var(--line); }
-button:disabled { opacity: .45; cursor: not-allowed; }
-button.primary { color: var(--accent-text); background: linear-gradient(90deg, var(--accent), var(--accent2)); border: 0; }
-button.danger { color: var(--bad); background: color-mix(in srgb, var(--bad) 10%, var(--surface-solid)); border-color: color-mix(in srgb, var(--bad) 35%, var(--line)); }
-button.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
-
-.codebox { display: flex; gap: 10px; align-items: center; }
-.codebox input { flex: 1; min-width: 0; font: inherit; font-weight: 800; font-size: 22px; letter-spacing: 6px; text-transform: uppercase;
-  color: var(--text); background: var(--surface-solid); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
-.status { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-.status i { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
-.status.on i { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 20%, transparent); }
-.status.busy i { background: var(--warn); }
-.status.off i { background: var(--bad); }
-.status small { display: block; color: var(--muted); font-size: 13px; }
-
-/* body colours */
-.swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.swatches button { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-weight: 600; font-size: 14px; }
-.swatches i { width: 26px; height: 20px; border-radius: 10px 10px 6px 6px; flex: none; border: 1px solid rgba(0,0,0,.15); }
-
-.switch { position: relative; width: 52px; height: 30px; flex: none; }
-.switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-.switch span { position: absolute; inset: 0; border-radius: 999px; background: var(--line); cursor: pointer; transition: .2s; }
-.switch span::after { content: ""; position: absolute; left: 4px; top: 4px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
-.switch input:checked + span { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
-.switch input:checked + span::after { transform: translateX(22px); }
-.switch input:disabled + span { opacity: .45; cursor: not-allowed; }
-
-input[type=range] { width: 100%; accent-color: var(--accent); }
-select, input[type=number] { font: inherit; color: var(--text); background: var(--surface-solid); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
-input[type=number] { width: 84px; }
-.seg { display: inline-grid; grid-auto-flow: column; gap: 4px; padding: 3px; border-radius: 12px; background: var(--surface-solid); border: 1px solid var(--line); }
-.seg button { border: 0; padding: 8px 12px; border-radius: 9px; background: transparent; color: var(--muted); }
-.seg button.on { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--text); box-shadow: none; }
-.big { font-size: 22px; font-weight: 800; letter-spacing: .5px; }
-.note { font-size: 14px; color: var(--muted); }
-.toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px); opacity: 0;
-  background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-weight: 600; transition: .25s; pointer-events: none; max-width: 90vw; z-index: 20; }
-.toast.show { opacity: 1; transform: translateX(-50%); }
-#doi-ma { scroll-margin-top: 110px; }
-ol.steps { margin: 0; padding-left: 22px; }
-ol.steps li { margin: 6px 0; }
-code { background: var(--code); border-radius: 6px; padding: 1px 6px; font-family: Consolas, monospace; font-size: 14px; }
-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
-@media (max-width: 420px) { .swatches { grid-template-columns: repeat(2, 1fr); } .lbl { min-width: 0; width: 100%; } }
-</style>
+<link rel="stylesheet" href="site.css?v=20261128">
+<link rel="stylesheet" href="mochi-panel.css?v=20261128">
 </head>
 <body>
 <header data-active="settings"></header>
 
 <main>
   <h1>Cài đặt <b>Mochi</b></h1>
-  <p class="lead">Đổi màu, bật đồng hồ, hẹn giờ, chỉnh âm lượng, giờ ngủ… từ xa qua Wi-Fi. Mọi thay đổi được Mochi lưu lại.</p>
+  <p class="lead">Âm lượng, hẹn giờ, cài lại Wi-Fi, khởi động lại và mã của Mochi. Màu, đồng hồ, thời tiết nằm ở trang <a href="giao-dien.html">Giao diện</a>.</p>
 
   <div class="card">
     <label class="lbl" for="code">Mã của Mochi</label>
@@ -96,23 +34,15 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 
   <fieldset id="controls" disabled>
   <div class="card">
-    <h2><span>🎨</span>Giao diện</h2>
-    <div class="swatches" id="colors"></div>
-    <div class="row">
-      <button class="danger grow" data-cmd="text_off">⏹ Tắt chạy chữ</button>
-      <button class="grow" data-cmd="pet">💗 Thả tim</button>
-    </div>
+    <h2><span>🔊</span>Âm thanh</h2>
+    <div class="row"><span class="lbl grow">Âm lượng</span><span class="big" id="volVal">–</span></div>
+    <input type="range" id="volume" min="0" max="100" step="5" value="60" aria-label="Âm lượng">
   </div>
 
   <div class="card">
-    <h2><span>⏰</span>Đồng hồ & hẹn giờ</h2>
+    <h2><span>⏳</span>Hẹn giờ</h2>
     <div class="row">
-      <span class="lbl grow">Chế độ đồng hồ<br><span class="muted" style="font-weight:400">Hiện giờ to mỗi khi Mochi rảnh</span></span>
-      <label class="switch"><input type="checkbox" id="clock"><span></span></label>
-    </div>
-    <div class="row"><button class="grow" data-cmd="clock_show">Xem giờ nhanh (8 giây)</button></div>
-    <div class="row">
-      <span class="lbl">Hẹn giờ</span>
+      <span class="lbl">Đang hẹn</span>
       <span class="muted grow" id="timerLeft">Không có hẹn giờ</span>
     </div>
     <div class="row" id="timerQuick">
@@ -126,31 +56,19 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   </div>
 
   <div class="card">
-    <h2><span>🔊</span>Âm thanh</h2>
-    <div class="row"><span class="lbl grow">Âm lượng</span><span class="big" id="volVal">–</span></div>
-    <input type="range" id="volume" min="0" max="100" step="5" value="60" aria-label="Âm lượng">
-  </div>
-
-  <div class="card">
-    <h2><span>🌙</span>Ngủ & giật mình</h2>
+    <h2><span>✨</span>Khác</h2>
     <div class="row">
-      <span class="lbl">Ngủ đêm</span>
-      <select id="bedS" aria-label="Giờ đi ngủ"></select> <span class="muted">đến</span> <select id="bedE" aria-label="Giờ dậy"></select>
-      <button id="bedSave">Lưu</button>
-    </div>
-    <p class="note" style="margin:6px 0 0">Ban đêm Mochi tự ngủ, màn tối. Chọn hai giờ giống nhau để tắt ngủ đêm.</p>
-    <div class="row">
-      <button class="grow" data-cmd="sleep">😴 Cho Mochi ngủ</button>
-      <button class="grow" data-cmd="wake">☀️ Đánh thức</button>
-    </div>
-    <div class="row">
-      <span class="lbl">Giật mình khi có tiếng động to</span>
-      <span class="seg" id="startle"><button data-v="0">Tắt</button><button data-v="3000">Ít</button><button data-v="1500">Vừa</button><button data-v="800">Nhiều</button></span>
+      <button class="danger grow" data-cmd="text_off">⏹ Tắt chạy chữ</button>
+      <button class="grow" data-cmd="pet">💗 Thả tim</button>
     </div>
   </div>
 
   <div class="card">
     <h2><span>⚙️</span>Hệ thống</h2>
+    <div class="update" id="upd">
+      <div class="grow"><b id="updTitle">Phiên bản Mochi: –</b><small id="updSub">Đang kiểm tra bản mới nhất…</small></div>
+      <button class="primary" id="updBtn" disabled>⬆ Cập nhật qua Wi-Fi</button>
+    </div>
     <div class="row">
       <button class="grow" id="wifi">📶 Cài lại Wi-Fi</button>
       <button class="danger grow" id="reboot">↻ Khởi động lại</button>
@@ -172,130 +90,14 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
     <p class="note" style="margin:10px 0 0">Mã cũ hết dùng ngay lập tức. Mã mới chỉ hiện trên màn Mochi, không bao giờ được gửi qua mạng, nên người đang giữ mã cũ không thể biết. Lỡ giữ nhầm? Chạm sang mục khác hoặc chờ 10 giây là không đổi.</p>
   </div>
 
+
   <p class="note">Lệnh đi qua máy chủ nhắn tin công cộng (broker.emqx.io). Ai biết mã của Mochi cũng điều khiển được Mochi, kể cả khởi động lại, nên đừng chia sẻ mã.</p>
 </main>
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261126"></script>
-<script src="mochi-link.js?v=20261126"></script>
-<script>
-// Must match OnRemoteCommand / StateJson in the firmware (mochi_c3_board.cc)
-const { Mqtt, BROKER, CODE_RE, topic } = window.MochiLink;
-const COLORS = [['Hồng phấn', '#fac8d4'], ['Bạc hà', '#baecd4'], ['Vàng kem', '#fce6ac'], ['Tím', '#d6c6f6'], ['Trắng', '#eeeeee'], ['Đen', '#111111']];
-const $ = (id) => document.getElementById(id);
-let mq = null, code = '', online = null, state = null, gotState = false;
-
-function toast(msg) {
-  const t = $('toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600);
-}
-function setStatus(kind, title, sub) {
-  $('status').className = 'status ' + kind; $('stTitle').textContent = title; $('stSub').textContent = sub;
-}
-function refreshStatus() {
-  const ready = !!(mq && mq.ready);
-  $('btnConnect').textContent = ready ? 'Đổi mã' : 'Kết nối';
-  $('controls').disabled = !(ready && online && gotState);
-  if (!ready) return;
-  if (online === false) setStatus('off', 'Mochi đang tắt hoặc mất mạng', 'Bật Mochi rồi thử lại');
-  else if (online && gotState) setStatus('on', 'Mochi đang trực tuyến', 'Mã ' + code + ' · sẵn sàng');
-  else if (online) setStatus('busy', 'Mochi trực tuyến, chưa có cài đặt', 'Firmware cũ chưa hỗ trợ trang này: nạp bản mới ở mục Nạp firmware');
-  else setStatus('busy', 'Đã kết nối máy chủ', 'Chưa thấy Mochi mã ' + code + '. Kiểm tra mã hoặc chờ Mochi khởi động xong');
-}
-
-// ---------- controls from the state Mochi publishes ----------
-function render() {
-  if (!state) return;
-  document.querySelectorAll('#colors button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.color));
-  $('clock').checked = state.clock === 1;
-  $('volume').value = state.volume; $('volVal').textContent = state.volume + '%';
-  $('bedS').value = state.bed_s; $('bedE').value = state.bed_e;
-  document.querySelectorAll('#startle button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.startle));
-  const t = state.timer;
-  $('timerLeft').textContent = t > 0 ? 'Còn ' + Math.floor(t / 60) + ' phút ' + String(t % 60).padStart(2, '0') + ' giây' : 'Không có hẹn giờ';
-  $('info').textContent = 'Giờ trên Mochi: ' + state.time + ' · Firmware: ' + state.fw + (state.sleep ? ' · Đang ngủ' : '');
-}
-
-function send(cmd, extra) {
-  if (!mq || !mq.ready) return false;
-  mq.publish(topic(code, 'cmd'), JSON.stringify(Object.assign({ cmd }, extra || {})));
-  return true;
-}
-const DONE = { text_off: 'Đã tắt chạy chữ', pet: 'Mochi được thả tim 💗', clock_show: 'Mochi đang hiện giờ', sleep: 'Mochi sẽ đi ngủ', wake: 'Đã đánh thức Mochi' };
-
-function connect() {
-  const c = $('code').value.trim().toUpperCase();
-  if (!CODE_RE.test(c)) { toast('Mã gồm 6 chữ/số, xem trong menu của Mochi'); $('code').focus(); return; }
-  if (mq) mq.close();
-  code = c; online = null; state = null; gotState = false;
-  window.MochiLink.saveCode(code);
-  setStatus('busy', 'Đang kết nối…', 'Tới máy chủ nhắn tin');
-  mq = new Mqtt(BROKER, window.MochiLink.clientId(), (tp, payload) => {
-    if (tp.endsWith('/status')) online = payload === 'online';
-    else if (tp.endsWith('/state')) {
-      try { state = JSON.parse(payload); gotState = true; render(); } catch (e) {}
-    }
-    refreshStatus();
-  }, (st) => {
-    if (st === 'ready') {
-      mq.subscribe(topic(code, 'status'));
-      mq.subscribe(topic(code, 'state'));
-      setTimeout(refreshStatus, 2500);
-    } else if (st === 'closed') setStatus('', 'Mất kết nối', 'Bấm Kết nối để thử lại');
-    else setStatus('', 'Máy chủ từ chối kết nối', 'Thử lại sau ít phút');
-    refreshStatus();
-  });
-  mq.open();
-}
-
-// ---------- build + wire the controls ----------
-$('colors').innerHTML = COLORS.map(([n, c], i) => `<button data-v="${i}"><i style="background:${c}"></i>${n}</button>`).join('');
-$('colors').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (send('color', { v: +b.dataset.v })) toast('Đổi màu: ' + COLORS[+b.dataset.v][0]);
-});
-document.querySelectorAll('[data-cmd]').forEach((b) => b.addEventListener('click', () => {
-  if (send(b.dataset.cmd)) toast(DONE[b.dataset.cmd] || 'Đã gửi');
-}));
-$('clock').addEventListener('change', () => {
-  if (send('clock', { v: $('clock').checked ? 1 : 0 })) toast($('clock').checked ? 'Đã bật chế độ đồng hồ' : 'Đã tắt chế độ đồng hồ');
-});
-const setTimer = (min) => { if (send('timer', { v: Math.round(min * 60) })) toast('Hẹn giờ ' + min + ' phút'); };
-$('timerQuick').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setTimer(+b.dataset.min); });
-$('timerSet').addEventListener('click', () => {
-  const m = +$('timerMin').value;
-  if (!(m >= 1 && m <= 600)) { toast('Chọn từ 1 đến 600 phút'); return; }
-  setTimer(m);
-});
-$('timerCancel').addEventListener('click', () => { if (send('timer', { v: 0 })) toast('Đã huỷ hẹn giờ'); });
-$('volume').addEventListener('input', () => { $('volVal').textContent = $('volume').value + '%'; });
-$('volume').addEventListener('change', () => { if (send('volume', { v: +$('volume').value })) toast('Âm lượng ' + $('volume').value + '%'); });
-for (const id of ['bedS', 'bedE']) {
-  $(id).innerHTML = Array.from({ length: 24 }, (_, h) => `<option value="${h}">${String(h).padStart(2, '0')}:00</option>`).join('');
-}
-$('bedSave').addEventListener('click', () => {
-  const s = +$('bedS').value, e = +$('bedE').value;
-  if (send('bed', { start: s, end: e })) toast(s === e ? 'Đã tắt ngủ đêm' : 'Ngủ từ ' + s + ':00 đến ' + e + ':00');
-});
-$('startle').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (send('startle', { v: +b.dataset.v })) toast('Giật mình: ' + b.textContent);
-});
-$('wifi').addEventListener('click', () => {
-  if (!confirm('Mochi sẽ ngắt Wi-Fi nhà và phát Wi-Fi "N-Mochi_AI_Lab-xxxx" để bạn chọn mạng khác. Trong lúc đó trang này không điều khiển được Mochi. Tiếp tục?')) return;
-  if (send('wifi')) toast('Mochi đang vào chế độ cài Wi-Fi');
-});
-$('reboot').addEventListener('click', () => {
-  if (!confirm('Khởi động lại Mochi? Mochi sẽ mất kết nối khoảng 30 giây.')) return;
-  if (send('reboot')) toast('Mochi đang khởi động lại');
-});
-
-$('btnConnect').addEventListener('click', connect);
-$('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
-$('code').addEventListener('input', () => { $('code').value = $('code').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
-const saved = window.MochiLink.savedCode();
-if (saved) { $('code').value = saved; connect(); }
-</script>
+<script src="site.js?v=20261128"></script>
+<script src="mochi-link.js?v=20261128"></script>
+<script src="mochi-panel.js?v=20261128"></script>
 </body>
 </html>

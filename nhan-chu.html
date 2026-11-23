@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261126">
+<link rel="stylesheet" href="site.css?v=20261128">
 <style>
-:root { --screen: #0b0b10; --body: #f7b6cb; }
+:root { --screen: #0b0b10; --body: #fac8d4; --ink: #2c2838; }
 body { font-size: 16px; }
 main { max-width: 560px; margin: 0 auto; padding: 22px 16px 40px; }
 h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: -.5px; line-height: 1.25; }
@@ -27,7 +27,7 @@ h1 b { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webki
 /* mini mochi screen preview */
 .screen { position: relative; aspect-ratio: 2 / 1; border-radius: 12px; background: var(--screen); overflow: hidden; border: 6px solid #1c1a22; }
 .screen .blob { position: absolute; left: 4%; right: 4%; top: 6%; bottom: 0; background: var(--body); border-radius: 38% 38% 8% 8% / 60% 60% 10% 10%; }
-.screen .eye { position: absolute; top: 24%; width: 7%; height: 22%; border-radius: 99px; background: #2c2838; }
+.screen .eye { position: absolute; top: 24%; width: 7%; height: 22%; border-radius: 99px; background: var(--ink); }
 .screen .eye.l { left: 30%; } .screen .eye.r { right: 30%; }
 .screen .bar { position: absolute; left: 4%; right: 4%; bottom: 0; height: 28%; display: flex; align-items: center; overflow: hidden; background: var(--body); }
 .screen .bar span { white-space: nowrap; padding-left: 100%; color: #fff; font-weight: 600; font-size: clamp(13px, 4.2vw, 19px); text-shadow: 0 1px 0 rgba(0,0,0,.25); animation: scroll 9s linear infinite; }
@@ -94,6 +94,11 @@ select { font: inherit; color: var(--text); background: var(--surface-solid); bo
 .seg button.on { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--text); }
 input[type=range] { width: 100%; accent-color: var(--accent); }
 .hidden { display: none !important; }
+.chiplabel { margin: 14px 2px 0; font-size: 13px; font-weight: 700; color: var(--muted); }
+.chiplabel + .chips { margin-top: 6px; }
+.symnote { margin: 6px 2px 0; font-size: 13px; }
+.chips.syms button { min-width: 40px; font-size: 18px; padding: 4px 10px; font-family: "DejaVu Sans", "Segoe UI Symbol", sans-serif; }
+
 .stop { width: 100%; margin-top: 10px; color: var(--bad); background: color-mix(in srgb, var(--bad) 10%, var(--surface-solid));
   border: 1px solid color-mix(in srgb, var(--bad) 35%, var(--line)); }
 </style>
@@ -184,12 +189,24 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
       <button class="primary grow" id="btnSend" disabled>Gửi lên Mochi</button>
     </div>
     <button class="stop" id="btnClear" disabled>⏹ Tắt chạy chữ</button>
+    <p class="chiplabel">Ký hiệu Mochi hiện được (bấm để chèn)</p>
+    <!-- exactly the symbols in the mochi_vi fonts (tools/fontgen/render.html) -->
+    <div class="chips syms" id="syms">
+      <button>♥</button><button>★</button><button>☆</button><button>☀</button><button>☁</button><button>☂</button>
+      <button>♪</button><button>♫</button><button>☺</button><button>✓</button><button>→</button><button>←</button>
+      <button>•</button><button>…</button><button>°</button>
+    </div>
+    <p class="note symnote" id="symNote">Ký hiệu chỉ hiện ở giao diện <b>Màu nền + chữ to</b>. Ở giao diện Mochi + chữ, Mochi bỏ trống ký hiệu.</p>
+    <p class="chiplabel">Câu mẫu</p>
     <div class="chips" id="quick">
-      <button>Chúc ngủ ngon</button>
-      <button>Chào buổi sáng!</button>
-      <button>Đi ăn cơm thôi</button>
-      <button>Nhớ uống nước nha</button>
-      <button>Yêu cả nhà</button>
+      <button>Chúc ngủ ngon ★</button>
+      <button>Chào buổi sáng ☀</button>
+      <button>Đi ăn cơm thôi ♪</button>
+      <button>Nhớ uống nước nha ☺</button>
+      <button>Yêu cả nhà ♥</button>
+      <button>Trời mưa nhớ mang ô ☂</button>
+      <button>Xong việc rồi ✓</button>
+      <button>Hôm nay 30°</button>
     </div>
   </div>
 
@@ -198,8 +215,8 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261126"></script>
-<script src="mochi-link.js?v=20261126"></script>
+<script src="site.js?v=20261128"></script>
+<script src="mochi-link.js?v=20261128"></script>
 <script>
 // Must match mochi_remote.h in the firmware
 const { Mqtt, BROKER, CODE_RE } = window.MochiLink;
@@ -253,6 +270,7 @@ function renderControls() {
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === st.mode));
   $('screen').classList.toggle('color', st.mode === 'color');
   $('colorOpts').classList.toggle('hidden', st.mode !== 'color');
+  $('symNote').classList.toggle('hidden', st.mode === 'color');
   $('bg').value = st.bg; $('bg2').value = st.bg2; $('fg').value = st.fg; $('grad').checked = st.grad;
   $('bg2').classList.toggle('hidden', !st.grad); $('dirSeg').classList.toggle('hidden', !st.grad);
   document.querySelectorAll('#dirSeg button').forEach(b => b.classList.toggle('on', b.dataset.dir === st.dir));
@@ -313,6 +331,7 @@ function connect() {
     if (st === 'ready') {
       mq.subscribe(TOPIC(code, 'status'));
       mq.subscribe(TOPIC(code, 'ack'));
+      mq.subscribe(TOPIC(code, 'state'));  // the body colour for the preview
       showMochiState();
       setTimeout(showMochiState, 2500);
     } else if (st === 'closed') {
@@ -324,8 +343,20 @@ function connect() {
   mq.open();
 }
 
+// paint the preview in Mochi's real body colour (black body: white eyes on black, as on Mochi)
+function setBody(i) {
+  const c = window.MochiLink.BODY_COLORS[i];
+  if (!c) return;
+  const root = document.documentElement.style;
+  root.setProperty('--body', c.hex);
+  root.setProperty('--ink', c.dark ? '#ffffff' : '#2c2838');
+}
+
 function onMessage(topic, payload) {
   if (topic.endsWith('/status')) { mochiOnline = payload === 'online'; showMochiState(); }
+  else if (topic.endsWith('/state')) {
+    try { setBody(JSON.parse(payload).color); } catch (e) {}
+  }
   else if (topic.endsWith('/ack') && waitingAck) {
     clearTimeout(waitingAck.timer);
     toast(waitingAck.clear ? 'Đã tắt chạy chữ trên Mochi' : 'Mochi đã nhận ✓');
@@ -363,6 +394,15 @@ $('msg').addEventListener('keydown', (e) => {
 $('quick').addEventListener('click', (e) => {
   if (e.target.tagName !== 'BUTTON') return;
   $('msg').value = e.target.textContent; updateSend(); $('msg').focus();
+});
+$('syms').addEventListener('click', (e) => {  // insert the symbol where the cursor is
+  if (e.target.tagName !== 'BUTTON') return;
+  const m = $('msg'), sym = e.target.textContent;
+  const a = m.selectionStart ?? m.value.length, b = m.selectionEnd ?? m.value.length;
+  m.value = m.value.slice(0, a) + sym + m.value.slice(b);
+  m.focus();
+  m.setSelectionRange(a + sym.length, a + sym.length);
+  updateSend();
 });
 
 renderControls();

@@ -5,9 +5,10 @@
 (function () {
   const MENU = [
     { id: 'home', href: './', text: 'Trang chủ' },
-    { id: 'firmware', href: 'nap-firmware.html', text: 'Nạp firmware' },
+    { id: 'look', href: 'giao-dien.html', text: 'Giao diện' },
     { id: 'text', href: 'nhan-chu.html', text: 'Nhắn chữ' },
     { id: 'settings', href: 'cai-dat.html', text: 'Cài đặt' },
+    { id: 'firmware', href: 'nap-firmware.html', text: 'Nạp firmware' },
   ];
   const LOGO = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="10" width="56" height="48" rx="22" fill="#f7b6cb"/>' +
     '<rect x="18" y="26" width="8" height="11" rx="4" fill="#2c2838"/><rect x="38" y="26" width="8" height="11" rx="4" fill="#2c2838"/>' +

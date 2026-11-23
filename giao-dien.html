@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Giao diện Mochi · Mochi AI Lab</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#fbf6f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17132a">
+<meta name="apple-mobile-web-app-title" content="Mochi AI Lab">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=20261128">
+<link rel="stylesheet" href="mochi-panel.css?v=20261128">
+</head>
+<body>
+<header data-active="look"></header>
+
+<main>
+  <h1>Giao diện <b>Mochi</b></h1>
+  <p class="lead">Màu Mochi, chế độ và kiểu đồng hồ, màu nền đồng hồ, thời tiết, giờ ngủ và giật mình. Mọi thay đổi được Mochi lưu lại.</p>
+
+  <div class="card">
+    <label class="lbl" for="code">Mã của Mochi</label>
+    <div class="codebox" style="margin-top:8px">
+      <input id="code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
+      <button class="primary" id="btnConnect">Kết nối</button>
+    </div>
+    <div class="status" id="status"><i></i><div><b id="stTitle">Chưa kết nối</b><small id="stSub">Xem mã trên Mochi: giữ nút chạm 2 giây, chạm tới mục Code web (<a href="cai-dat.html#doi-ma">hướng dẫn</a>)</small></div></div>
+  </div>
+
+  <fieldset id="controls" disabled>
+  <div class="card">
+    <h2><span>🎨</span>Màu Mochi</h2>
+    <div class="swatches" id="colors"></div>
+  </div>
+
+  <div class="card">
+    <h2><span>⏰</span>Đồng hồ</h2>
+    <div class="row">
+      <span class="lbl grow">Chế độ đồng hồ<br><span class="muted" style="font-weight:400">Hiện giờ to mỗi khi Mochi rảnh</span></span>
+      <label class="switch"><input type="checkbox" id="clock"><span></span></label>
+    </div>
+    <div class="row"><button class="grow" data-cmd="clock_show">Xem giờ nhanh (8 giây)</button></div>
+    <p class="lbl" style="margin:14px 0 8px">Kiểu đồng hồ</p>
+    <div class="faces" id="faces">
+      <button data-v="0"><span class="face seg7">12:34</span>Số 7 đoạn</button>
+      <button data-v="1"><span class="face analog"><i></i><i></i></span>Kim đồng hồ</button>
+      <button data-v="2"><span class="face big">12:34<small>Thứ Hai, 23/11</small></span>Số to + ngày</button>
+      <button data-v="3"><span class="face wx">☀<b>12:34<small>28° · 19–30°</small></b></span>Giờ + thời tiết</button>
+    </div>
+    <p class="lbl" style="margin:14px 0 8px">Màu nền đồng hồ</p>
+    <div class="bgs" id="clockBg"></div>
+  </div>
+
+  <div class="card">
+    <h2><span>🌤</span>Thời tiết</h2>
+    <div class="wxnow" id="wxNow"><span class="wxicon" id="wxIcon">…</span><div><b id="wxTemp">Đang chờ Mochi</b><small id="wxMore">Mochi lấy thời tiết 30 phút một lần khi rảnh</small></div></div>
+    <div class="row">
+      <span class="lbl grow">Vị trí<br><span class="muted" style="font-weight:400" id="wxWhere">–</span></span>
+      <button id="wxAuto">📍 Tự động theo mạng</button>
+    </div>
+    <div class="row">
+      <input id="wxCity" class="grow" placeholder="Tìm thành phố, ví dụ Đà Nẵng" autocomplete="off">
+      <button id="wxFind">Tìm</button>
+    </div>
+    <div class="results" id="wxResults"></div>
+    <div class="row"><button class="grow" data-cmd="weather_refresh">↻ Cập nhật thời tiết ngay</button></div>
+    <p class="note" style="margin:10px 0 0">Dữ liệu từ Open-Meteo. "Tự động" đoán vị trí theo địa chỉ mạng (ip-api.com), thường đúng tới thành phố.</p>
+  </div>
+
+  <div class="card">
+    <h2><span>🌙</span>Ngủ & giật mình</h2>
+    <div class="row">
+      <span class="lbl">Ngủ đêm</span>
+      <select id="bedS" aria-label="Giờ đi ngủ"></select> <span class="muted">đến</span> <select id="bedE" aria-label="Giờ dậy"></select>
+      <button id="bedSave">Lưu</button>
+    </div>
+    <p class="note" style="margin:6px 0 0">Ban đêm Mochi tự ngủ, màn tối. Chọn hai giờ giống nhau để tắt ngủ đêm.</p>
+    <div class="row">
+      <button class="grow" data-cmd="sleep">😴 Cho Mochi ngủ</button>
+      <button class="grow" data-cmd="wake">☀️ Đánh thức</button>
+    </div>
+    <div class="row">
+      <span class="lbl">Giật mình khi có tiếng động to</span>
+      <span class="seg" id="startle"><button data-v="0">Tắt</button><button data-v="3000">Ít</button><button data-v="1500">Vừa</button><button data-v="800">Nhiều</button></span>
+    </div>
+  </div>
+  </fieldset>
+
+  <p class="note">Lệnh đi qua máy chủ nhắn tin công cộng (broker.emqx.io). Ai biết mã của Mochi cũng điều khiển được Mochi, kể cả khởi động lại, nên đừng chia sẻ mã.</p>
+</main>
+<footer></footer>
+<div class="toast" id="toast"></div>
+
+<script src="site.js?v=20261128"></script>
+<script src="mochi-link.js?v=20261128"></script>
+<script src="mochi-panel.js?v=20261128"></script>
+</body>
+</html>

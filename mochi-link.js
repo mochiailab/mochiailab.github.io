@@ -67,8 +67,13 @@ class Mqtt {
 const BROKER = 'wss://broker.emqx.io:8084/mqtt';
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/;
 const KEY = 'mochiCode';  // the same code on every page of the site
+// Mochi's body colours, same order and RGB as kBodies in mochi_display.h ("color" in the state)
+const BODY_COLORS = [
+  { name: 'Hồng phấn', hex: '#fac8d4' }, { name: 'Bạc hà', hex: '#baecd4' }, { name: 'Vàng kem', hex: '#fce6ac' },
+  { name: 'Tím', hex: '#d6c6f6' }, { name: 'Trắng', hex: '#eeeeee' }, { name: 'Đen', hex: '#000000', dark: true },
+];
 window.MochiLink = {
-  Mqtt, BROKER, CODE_RE,
+  Mqtt, BROKER, CODE_RE, BODY_COLORS,
   topic: (code, leaf) => 'mochiailab/v1/' + code + '/' + leaf,
   savedCode() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } },
   saveCode(code) { try { localStorage.setItem(KEY, code); } catch (e) {} },
