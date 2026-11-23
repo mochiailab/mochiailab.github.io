@@ -11,8 +11,9 @@ Trang web của Mochi: nạp firmware **Mochi AI** ngay trên trình duyệt, s�
 | `esp32-c3.html` | ESP32-C3 + ST7735S 0.96": nút nạp, sơ đồ **Loại 1 – có pin** / **Loại 2 – không pin**, bảng chân, lưu ý |
 | `esp32-s3.html` | ESP32-S3 N16R8 (sắp có): sơ đồ dự kiến |
 | `nhan-chu.html` | Nhắn chữ lên Mochi qua Wi-Fi (MQTT qua `broker.emqx.io`), giao diện Mochi + chữ hoặc Màu nền + chữ to |
+| `cai-dat.html` | Cài đặt Mochi từ xa: màu thân, đồng hồ, hẹn giờ, âm lượng, giờ ngủ, giật mình, cài lại Wi-Fi, khởi động lại; hướng dẫn đổi mã |
 
-Dùng chung: `site.css` (màu sáng/tối, thanh menu, thẻ, bố cục), `site.js` (logo, menu và chân trang; thêm trang vào menu ở mảng `MENU`), `cards.js` (danh sách thẻ mạch `BOARDS` và tính năng `FEATURES`).
+Dùng chung: `site.css` (màu sáng/tối, thanh menu, thẻ, bố cục), `site.js` (logo, menu và chân trang; thêm trang vào menu ở mảng `MENU`), `cards.js` (danh sách thẻ mạch `BOARDS` và tính năng `FEATURES`), `mochi-link.js` (kết nối MQTT tới Mochi, dùng chung cho Nhắn chữ và Cài đặt; mã của Mochi lưu chung).
 Sơ đồ C3: `parts.js` (ảnh linh kiện + toạ độ chân) và `diagram.js` (`MochiC3Diagram.show(1 | 2)`).
 
 Thêm mạch hoặc tính năng mới: tạo trang mới, thêm một mục vào `BOARDS` hoặc `FEATURES` trong `cards.js` (trang chủ và trang Nạp firmware tự cập nhật), và (nếu cần) một dòng trong `MENU` của `site.js`.
@@ -24,4 +25,4 @@ Mở trang bằng **Chrome hoặc Edge trên máy tính**, cắm Mochi bằng US
 ## Cập nhật firmware
 
 Thay `firmware/mochi_c3_full.bin`, sửa `version` trong `manifest-c3.json` và dòng "Phiên bản" trong `esp32-c3.html`, rồi commit và push.
-Khi sửa `site.css`, `site.js`, `cards.js`, `parts.js` hoặc `diagram.js`, đổi luôn số `?v=` ở chỗ các trang gọi file đó để trình duyệt không dùng bản cũ.
+Khi sửa `site.css`, `site.js`, `cards.js`, `mochi-link.js`, `parts.js` hoặc `diagram.js`, đổi luôn số `?v=` ở chỗ các trang gọi file đó để trình duyệt không dùng bản cũ.

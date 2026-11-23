@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261124">
+<link rel="stylesheet" href="site.css?v=20261126">
 <style>
 :root { --screen: #0b0b10; --body: #f7b6cb; }
 body { font-size: 16px; }
@@ -94,6 +94,8 @@ select { font: inherit; color: var(--text); background: var(--surface-solid); bo
 .seg button.on { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--text); }
 input[type=range] { width: 100%; accent-color: var(--accent); }
 .hidden { display: none !important; }
+.stop { width: 100%; margin-top: 10px; color: var(--bad); background: color-mix(in srgb, var(--bad) 10%, var(--surface-solid));
+  border: 1px solid color-mix(in srgb, var(--bad) 35%, var(--line)); }
 </style>
 </head>
 <body>
@@ -109,7 +111,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
       <input id="code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123">
       <button class="primary" id="btnConnect">Kết nối</button>
     </div>
-    <p class="note" style="margin:8px 2px 0">Xem mã trên Mochi: giữ nút chạm 2 giây để mở menu, chạm để chuyển tới mục <b>Code web</b>.</p>
+    <p class="note" style="margin:8px 2px 0">Xem mã trên Mochi: giữ nút chạm 2 giây để mở menu, chạm để chuyển tới mục <b>Code web</b>. Mã bị lộ? <a href="cai-dat.html#doi-ma">Xem cách đổi mã mới</a>.</p>
   </div>
 
   <div class="card">
@@ -180,8 +182,8 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
         <option value="-1">Giữ đến khi xoá</option>
       </select>
       <button class="primary grow" id="btnSend" disabled>Gửi lên Mochi</button>
-      <button class="ghost" id="btnClear" disabled title="Xoá chữ trên màn Mochi">Xoá</button>
     </div>
+    <button class="stop" id="btnClear" disabled>⏹ Tắt chạy chữ</button>
     <div class="chips" id="quick">
       <button>Chúc ngủ ngon</button>
       <button>Chào buổi sáng!</button>
@@ -196,76 +198,16 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261124"></script>
+<script src="site.js?v=20261126"></script>
+<script src="mochi-link.js?v=20261126"></script>
 <script>
 // Must match mochi_remote.h in the firmware
-const BROKER = 'wss://broker.emqx.io:8084/mqtt';
-const TOPIC = (code, leaf) => 'mochiailab/v1/' + code + '/' + leaf;
+const { Mqtt, BROKER, CODE_RE } = window.MochiLink;
+const TOPIC = window.MochiLink.topic;
 const MAX_BYTES = 300;
-const CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/;
 
 const $ = (id) => document.getElementById(id);
 const enc = new TextEncoder(), dec = new TextDecoder();
-
-// ---------- tiny MQTT 3.1.1 client over WebSocket (CONNECT, SUBSCRIBE, PUBLISH qos 0, PING) ----------
-function mqttStr(s) { const b = enc.encode(s); return [b.length >> 8, b.length & 255, ...b]; }
-function mqttPacket(type, body) {
-  const len = []; let n = body.length;
-  do { let d = n % 128; n = Math.floor(n / 128); if (n > 0) d |= 128; len.push(d); } while (n > 0);
-  return new Uint8Array([type, ...len, ...body]);
-}
-class Mqtt {
-  constructor(url, clientId, onMessage, onState) {
-    this.url = url; this.clientId = clientId; this.onMessage = onMessage; this.onState = onState;
-    this.buf = new Uint8Array(0); this.pid = 1; this.ready = false;
-  }
-  open() {
-    this.ws = new WebSocket(this.url, 'mqtt');
-    this.ws.binaryType = 'arraybuffer';
-    this.ws.onopen = () => this.ws.send(mqttPacket(0x10, [...mqttStr('MQTT'), 4, 0x02, 0, 60, ...mqttStr(this.clientId)]));
-    this.ws.onmessage = (e) => this.feed(new Uint8Array(e.data));
-    this.ws.onclose = () => { this.ready = false; clearInterval(this.ping); this.onState('closed'); };
-  }
-  close() {
-    if (this.ws) {
-      try { this.ws.send(new Uint8Array([0xE0, 0])); } catch (e) {}
-      this.ws.onclose = null; this.ws.close();
-    }
-    clearInterval(this.ping); this.ready = false;
-  }
-  subscribe(topic) {
-    const id = this.pid++ & 0xffff;
-    this.ws.send(mqttPacket(0x82, [id >> 8, id & 255, ...mqttStr(topic), 0]));
-  }
-  publish(topic, payload) {
-    if (!this.ready) return false;
-    this.ws.send(mqttPacket(0x30, [...mqttStr(topic), ...enc.encode(payload)]));
-    return true;
-  }
-  feed(chunk) {
-    const b = new Uint8Array(this.buf.length + chunk.length); b.set(this.buf); b.set(chunk, this.buf.length); this.buf = b;
-    for (;;) {
-      if (this.buf.length < 2) return;
-      let mul = 1, len = 0, i = 1, d;
-      do { if (i >= this.buf.length) return; d = this.buf[i++]; len += (d & 127) * mul; mul *= 128; } while (d & 128);
-      if (this.buf.length < i + len) return;
-      const type = this.buf[0], body = this.buf.slice(i, i + len);
-      this.buf = this.buf.slice(i + len);
-      if ((type & 0xf0) === 0x20) {                 // CONNACK
-        if (body[1] === 0) {
-          this.ready = true;
-          this.ping = setInterval(() => { try { this.ws.send(new Uint8Array([0xC0, 0])); } catch (e) {} }, 30000);
-          this.onState('ready');
-        } else this.onState('refused');
-      } else if ((type & 0xf0) === 0x30) {          // PUBLISH
-        const tl = (body[0] << 8) | body[1];
-        const topic = dec.decode(body.slice(2, 2 + tl));
-        let p = 2 + tl; if (type & 0x06) p += 2;    // packet id when qos > 0
-        this.onMessage(topic, dec.decode(body.slice(p)));
-      }
-    }
-  }
-}
 
 // ---------- page ----------
 let mq = null, code = '', mochiOnline = null, waitingAck = null;
@@ -364,9 +306,9 @@ function connect() {
   if (!CODE_RE.test(c)) { toast('Mã gồm 6 chữ/số, xem trong menu của Mochi'); $('code').focus(); return; }
   if (mq) mq.close();
   code = c; mochiOnline = null;
-  localStorage.setItem('mochiCode', code);
+  window.MochiLink.saveCode(code);
   setStatus('busy', 'Đang kết nối…', 'Tới máy chủ nhắn tin');
-  const id = 'web-' + Math.random().toString(36).slice(2, 10);
+  const id = window.MochiLink.clientId();
   mq = new Mqtt(BROKER, id, onMessage, (st) => {
     if (st === 'ready') {
       mq.subscribe(TOPIC(code, 'status'));
@@ -386,7 +328,7 @@ function onMessage(topic, payload) {
   if (topic.endsWith('/status')) { mochiOnline = payload === 'online'; showMochiState(); }
   else if (topic.endsWith('/ack') && waitingAck) {
     clearTimeout(waitingAck.timer);
-    toast(waitingAck.clear ? 'Đã xoá chữ trên Mochi' : 'Mochi đã nhận ✓');
+    toast(waitingAck.clear ? 'Đã tắt chạy chữ trên Mochi' : 'Mochi đã nhận ✓');
     waitingAck = null;
   }
 }
@@ -408,7 +350,12 @@ $('btnConnect').addEventListener('click', connect);
 $('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
 $('code').addEventListener('input', () => { $('code').value = $('code').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
 $('btnSend').addEventListener('click', () => send($('msg').value.trim().replace(/\s+/g, ' '), +$('secs').value));
-$('btnClear').addEventListener('click', () => send('', 0));
+$('btnClear').addEventListener('click', () => {  // stops both styles (firmware: text_off)
+  if (!mq || !mq.ready) return;
+  mq.publish(TOPIC(code, 'cmd'), JSON.stringify({ cmd: 'text_off' }));
+  if (waitingAck) clearTimeout(waitingAck.timer);
+  waitingAck = { clear: true, timer: setTimeout(() => { waitingAck = null; toast('Chưa thấy Mochi trả lời. Mochi có đang bật không?'); }, 6000) };
+});
 $('msg').addEventListener('input', updateSend);
 $('msg').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!$('btnSend').disabled) $('btnSend').click(); }
@@ -419,7 +366,7 @@ $('quick').addEventListener('click', (e) => {
 });
 
 renderControls();
-const saved = localStorage.getItem('mochiCode');
+const saved = window.MochiLink.savedCode();
 if (saved) { $('code').value = saved; connect(); }
 updateSend();
 </script>

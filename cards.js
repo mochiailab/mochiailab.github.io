@@ -24,6 +24,11 @@
       text: 'Gõ một câu cho chữ chạy dưới mặt Mochi, hoặc chữ to trên nền màu bạn chọn.',
       href: 'nhan-chu.html', go: 'Mở ›',
     },
+    {
+      icon: '⚙', feature: true, title: 'Cài đặt Mochi', sub: 'Điều khiển từ xa qua Wi-Fi',
+      text: 'Đổi màu, bật đồng hồ, hẹn giờ, âm lượng, giờ ngủ, cài lại Wi-Fi, khởi động lại.',
+      href: 'cai-dat.html', go: 'Mở ›',
+    },
   ];
 
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
