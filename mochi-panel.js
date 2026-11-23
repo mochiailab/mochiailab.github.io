@@ -4,8 +4,9 @@
 (function () {
 const { Mqtt, BROKER, CODE_RE, topic } = window.MochiLink;
 // clock backgrounds, same order as kClockBgs in mochi_display.h (0 = Mochi's own colour)
-const CLOCK_BGS = [['Theo màu Mochi', ''], ['Đen', '#000000'], ['Xanh đêm', '#101a3c'], ['Tím than', '#2a1842'],
-  ['Xanh rêu', '#123a2e', ], ['Kem', '#faeed6', 1], ['Trắng', '#f4f4f4', 1]];
+const CLOCK_BGS = [['Theo màu Mochi', ''], ['Đen', '#000000'], ['Xanh trời', '#c4e2fc', 1], ['Tím nhạt', '#ded0fc', 1],
+  ['Bạc hà', '#c6f2d8', 1], ['Cam đào', '#ffd8c8', 1], ['Vàng chanh', '#fcf0aa', 1], ['Hồng phấn', '#ffd2e4', 1],
+  ['Kem', '#faeed6', 1], ['Trắng', '#f4f4f4', 1]];
 const COLORS = window.MochiLink.BODY_COLORS.map((c) => [c.name, c.dark ? '#111111' : c.hex]);
 // a page has only some of the controls: missing ones resolve to a detached dummy element
 const DUMMY = document.createElement('div');
