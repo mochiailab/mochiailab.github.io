@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mochi ESP32-C3 · Mochi AI Lab</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#fbf6f8">
+<meta name="apple-mobile-web-app-title" content="Mochi AI Lab">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=20261123">
+<script type="module" src="https://unpkg.com/esp-web-tools@10.0.1/dist/web/install-button.js?module"></script>
+<style>
+.crumb { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+.crumb a { color: inherit; }
+.steps { display: flex; gap: 8px; flex-wrap: wrap; }
+.steps span { font-size: 13px; font-weight: 600; color: var(--muted); background: var(--surface); border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px; }
+.steps b { color: var(--accent); margin-right: 4px; }
+
+.grid { display: grid; grid-template-columns: minmax(340px, 400px) 1fr; gap: 22px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 18px; position: sticky; top: 84px; }
+.label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+.label .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-text); font-size: 12px; letter-spacing: 0; }
+
+/* variant picker */
+.boards { display: grid; gap: 10px; }
+.boards input { position: absolute; opacity: 0; pointer-events: none; }
+.boards label { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; cursor: pointer;
+  padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--surface-solid); transition: border-color .15s, transform .15s; }
+.boards label:hover { transform: translateY(-1px); }
+.boards input:checked + label { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent); }
+.boards input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: 2px; }
+.chipicon { width: 44px; height: 44px; border-radius: 10px; background: var(--board); display: grid; place-items: center; color: var(--board-text); font-size: 18px; }
+.boards b { display: block; font-size: 16px; }
+.boards small { color: var(--muted); }
+
+/* flash */
+.btn { width: 100%; font: inherit; font-size: 17px; font-weight: 700; border: 0; border-radius: 14px; cursor: pointer;
+  padding: 15px 20px; color: #fff; background: linear-gradient(90deg, var(--accent), var(--accent2));
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 30%, transparent); transition: transform .15s, filter .15s; }
+.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+esp-web-install-button { display: block; }
+.fw { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.fw b { color: var(--text); }
+.warnbox { display: block; color: var(--warn); font-weight: 600; font-size: 14px; }
+ol { margin: 0; padding-left: 20px; }
+ol li { margin: 5px 0; }
+code { background: var(--code); border-radius: 6px; padding: 1px 6px; font-family: Consolas, monospace; font-size: 13px; }
+.hint { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.side a { color: var(--accent); font-weight: 600; }
+
+/* main: diagram */
+.main { min-width: 0; }
+.mainhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.mainhead h2 { margin: 0; font-size: 20px; }
+.mainhead h2 small { font-weight: 500; color: var(--muted); font-size: 14px; margin-left: 6px; }
+.seg { display: inline-flex; background: var(--surface-solid); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 600; border: 0; background: none; color: var(--muted); padding: 7px 16px; border-radius: 9px; cursor: pointer; }
+.seg button.on { background: var(--accent); color: var(--accent-text); }
+.diagram.photo { border-radius: 14px; overflow: auto; border: 1px solid var(--line); background: #fff; position: relative; cursor: zoom-in; }
+.diagram.photo > svg { display: block; width: 100%; height: auto; min-width: 900px; }
+.diagram.photo.full { position: fixed; inset: 0; z-index: 100; border-radius: 0; border: 0; cursor: zoom-out; display: grid; place-items: center; }
+.diagram.photo.full > svg { width: min(100vw, calc(100vh * 16 / 9)); min-width: 1200px; height: auto; }
+.zoomhint { position: absolute; right: 12px; top: 12px; font-size: 13px; font-weight: 600; color: #fff; background: rgba(36,31,46,.75); padding: 5px 10px; border-radius: 999px; pointer-events: none; }
+.diagram.photo.full .zoomhint { position: fixed; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+[data-view="table"] { overflow-x: auto; }
+[data-view="table"] table { min-width: 560px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: 3px; margin-right: 6px; }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 18px; }
+.note { padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
+.note b { display: block; margin-bottom: 4px; }
+
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: 1fr; }
+  .side { position: static; }
+}
+</style>
+</head>
+<body>
+<header data-active="firmware">
+  <span class="chip" id="envChip"><i></i><span id="envText">Đang kiểm tra trình duyệt…</span></span>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <p class="crumb"><a href="./">Trang chủ</a> › <a href="./#nap-firmware">Nạp firmware</a> › ESP32-C3</p>
+      <h1>Mochi <b>ESP32-C3</b> + màn ST7735S 0.96"</h1>
+      <p>Chọn loại Mochi, đấu dây theo sơ đồ, bấm nạp là chạy.</p>
+    </div>
+    <div class="steps"><span><b>1</b>Chọn loại</span><span><b>2</b>Đấu dây</span><span><b>3</b>Nạp firmware</span><span><b>4</b>Kết nối Wi-Fi</span></div>
+  </div>
+
+  <div class="grid">
+    <!-- ========== left column ========== -->
+    <aside class="side">
+      <div class="panel">
+        <p class="label"><span class="n">1</span>Chọn loại Mochi</p>
+        <div class="boards" role="radiogroup" aria-label="Loại Mochi">
+          <div>
+            <input type="radio" name="variant" id="v-1" value="1" checked>
+            <label for="v-1"><span class="chipicon">🔋</span><span><b>Loại 1 · Có pin</b><small>Pin 14250 + mạch sạc Type-C + công tắc</small></span></label>
+          </div>
+          <div>
+            <input type="radio" name="variant" id="v-2" value="2">
+            <label for="v-2"><span class="chipicon">🔌</span><span><b>Loại 2 · Không pin</b><small>Cắm cáp USB-C thẳng vào ESP32-C3</small></span></label>
+          </div>
+        </div>
+        <p class="hint">Hai loại dùng chung firmware, chỉ khác phần cấp điện.</p>
+      </div>
+
+      <div class="panel">
+        <p class="label"><span class="n">3</span>Nạp firmware</p>
+        <esp-web-install-button manifest="manifest-c3.json">
+          <button slot="activate" class="btn">⚡ Nạp Mochi AI</button>
+          <span slot="unsupported" class="warnbox">Trình duyệt này không nạp được: dùng Chrome hoặc Edge trên máy tính.</span>
+          <span slot="not-allowed" class="warnbox">Trang phải mở bằng link https (GitHub Pages) thì mới nạp được.</span>
+        </esp-web-install-button>
+        <div class="fw"><span>Phiên bản <b>23.11.2026 · bản 2</b></span><span>3,4 MB · xiaozhi.me</span></div>
+        <ol class="hint">
+          <li>Cắm Mochi bằng cáp USB-C, tắt Serial Monitor và cầu nối loa nếu đang mở.</li>
+          <li>Bấm nút, chọn <b>USB JTAG/serial debug unit</b>, rồi bấm <b>Connect</b> → <b>Install</b>.</li>
+          <li>Không kết nối được: giữ <b>BOOT</b>, nhấn <b>RST</b>, thả BOOT, rồi thử lại.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <p class="label"><span class="n">4</span>Sau khi nạp</p>
+        <ol>
+          <li>Kết nối điện thoại vào Wi-Fi <code>N-Mochi_AI_Lab-xxxx</code> do Mochi phát, chọn Wi-Fi nhà bạn và nhập mật khẩu.</li>
+          <li>Vào <code>xiaozhi.me</code>, thêm thiết bị bằng mã 6 số hiện trên màn.</li>
+          <li>Gọi <b>"Hi ESP"</b> để bắt đầu nói chuyện.</li>
+          <li>Muốn <a href="nhan-chu.html">nhắn chữ lên Mochi</a>: giữ nút chạm 2 giây, chạm tới mục <b>Code web</b> để xem mã.</li>
+        </ol>
+      </div>
+    </aside>
+
+    <!-- ========== right column ========== -->
+    <main class="main" id="daydien">
+      <div class="panel">
+        <div class="mainhead">
+          <h2><span class="label" style="display:inline-flex;margin:0 6px 0 0;vertical-align:2px"><span class="n">2</span></span>Sơ đồ đấu dây <small id="variantName">Loại 1 · Có pin</small></h2>
+          <div class="seg" role="tablist">
+            <button class="on" data-view="svg" role="tab" aria-selected="true">Sơ đồ</button>
+            <button data-view="table" role="tab" aria-selected="false">Bảng chân</button>
+          </div>
+        </div>
+
+        <!-- built from the real component photos (parts.js + diagram.js) -->
+        <div data-view="svg" class="diagram photo" id="c3photo"></div>
+
+        <div data-view="table" class="hidden">
+          <table>
+            <tr><th>Linh kiện</th><th>Tín hiệu</th><th>Nguồn</th></tr>
+            <tr><td>Màn ST7735S</td><td>CS→6 · DC→7 · RES→8 · SDA→9 · SCL→10</td><td>VCC→3V3 · GND · BLK để trống</td></tr>
+            <tr><td>Mic INMP441</td><td>SD→4 · WS→1 · SCK→2</td><td>VDD→3V3 · GND · L/R→GND</td></tr>
+            <tr><td>Ampli MAX98357A</td><td>LRC→1 · BCLK→2 · DIN→3</td><td>VIN→5V · GND · loa ở + / −</td></tr>
+            <tr><td>Nút chạm TTP223</td><td>I/O→5</td><td>VCC→3V3 · GND</td></tr>
+            <tr data-variant="1"><td>Pin 14250 3.7V</td><td>+ → B+ mạch sạc · − → B− mạch sạc</td><td>sạc qua cổng Type-C của mạch sạc</td></tr>
+            <tr data-variant="1"><td>Mạch sạc Type-C</td><td>OUT+ → chân giữa công tắc</td><td>OUT− → G (GND) của C3</td></tr>
+            <tr data-variant="1"><td>Công tắc gạt</td><td>chân bên → 5V của C3</td><td>chân còn lại để trống</td></tr>
+            <tr data-variant="2"><td>Nguồn điện</td><td>cáp USB-C cắm vào cổng của ESP32-C3</td><td>cục sạc 5V (từ 1A) hoặc cổng USB máy tính</td></tr>
+          </table>
+        </div>
+
+        <div class="legend">
+          <span><i style="background:var(--w-disp)"></i>Màn hình</span>
+          <span><i style="background:var(--w-ws)"></i>WS / LRC</span>
+          <span><i style="background:var(--w-clk)"></i>SCK / BCLK</span>
+          <span><i style="background:var(--w-data)"></i>Dữ liệu âm thanh</span>
+          <span><i style="background:var(--w-touch)"></i>Nút chạm</span>
+          <span><i style="background:var(--p33)"></i>3V3</span>
+          <span><i style="background:var(--p5)"></i>5V</span>
+        </div>
+      </div>
+
+      <div class="notes" id="luuy">
+        <div class="note"><b>Dùng chung dây</b>Mic và ampli dùng chung chân 1 (WS/LRC) và chân 2 (SCK/BCLK).</div>
+        <div class="note" data-variant="1"><b>Chạy bằng pin</b>Pin 3.7V vào chân 5V vẫn chạy được (mạch tự hạ xuống 3.3V). <b style="display:inline">Gạt công tắc OFF khi cắm USB vào ESP32 để nạp code.</b> Sạc pin thì cắm vào cổng Type-C của mạch sạc.</div>
+        <div class="note" data-variant="2"><b>Cấp điện qua USB-C</b>Cáp USB-C vừa cấp điện vừa dùng để nạp firmware. Ampli lấy 5V từ chân 5V, màn, mic và nút chạm lấy 3V3 của mạch. Dùng cục sạc từ 1A để loa không bị rè.</div>
+        <div class="note"><b>Cẩn thận GPIO8</b>Chỉ cắm chân RES của màn vào GPIO8. Cắm nhầm dây khác vào là màn sẽ tắt.</div>
+        <div class="note"><b>Dò số trên mạch</b>Thứ tự chân trong hình có thể khác mạch thật. Luôn đối chiếu số in trên mạch.</div>
+      </div>
+    </main>
+  </div>
+</div>
+<footer>Mochi AI Lab · Mochi AI chạy trên firmware xiaozhi-esp32</footer>
+
+<script src="site.js?v=20261123"></script>
+<script src="parts.js?v=20261123"></script>
+<script src="diagram.js?v=20261123"></script>
+<script>
+const NAMES = { 1: 'Loại 1 · Có pin', 2: 'Loại 2 · Không pin' };
+let variant = 1, view = 'svg';
+function render() {
+  document.querySelectorAll('[data-view]').forEach(el => {
+    if (el.tagName === 'BUTTON') return;
+    el.classList.toggle('hidden', el.dataset.view !== view);
+  });
+  document.querySelectorAll('[data-variant]').forEach(el => el.classList.toggle('hidden', +el.dataset.variant !== variant));
+  document.getElementById('variantName').textContent = NAMES[variant];
+  document.querySelectorAll('.seg button').forEach(b => {
+    const on = b.dataset.view === view;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-selected', on);
+  });
+  window.MochiC3Diagram.show(variant);
+}
+document.querySelectorAll('input[name=variant]').forEach(r => r.addEventListener('change', () => {
+  variant = +r.value;
+  try { localStorage.setItem('mochi-c3-variant', variant); } catch (e) {}
+  render();
+}));
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => { view = b.dataset.view; render(); }));
+try {
+  const saved = +localStorage.getItem('mochi-c3-variant');
+  if (NAMES[saved]) variant = saved;
+} catch (e) {}
+const asked = +new URLSearchParams(location.search).get('loai');  // links from the home page
+if (NAMES[asked]) variant = asked;
+document.getElementById('v-' + variant).checked = true;
+render();
+
+const ok = 'serial' in navigator && window.isSecureContext;
+const chip = document.getElementById('envChip');
+chip.classList.toggle('bad', !ok);
+document.getElementById('envText').innerHTML = ok
+  ? 'Sẵn sàng nạp<span class="long"> · Web Serial</span>'
+  : 'Không nạp được<span class="long">: dùng Chrome hoặc Edge trên máy tính</span>';
+</script>
+</body>
+</html>

@@ -1,15 +1,19 @@
 // Builds the ESP32-C3 wiring diagram from the real component photos (parts.js).
 // Canvas is 1600x900 (16:9). Each photo is placed at [x, y] with a display width; pins are
 // mapped from photo pixels to canvas coordinates, and wires are routed with H/V steps.
+// Two variants: 1 = with battery (14250 + Type-C charger + slide switch), 2 = no battery,
+// powered by a USB-C cable in the C3's own port.  window.MochiC3Diagram.show(variant)
 (function () {
   const P = window.MOCHI_PARTS;
   const W = 1600, H = 900;
 
   // where each photo goes: [x, y, display width]
-  const place = {
+  const BASE = {
     mic: [60, 60, 250], c3: [635, 270, 330], screen: [1180, 60, 330], amp: [80, 590, 240],
-    speaker: [300, 330, 120], charger: [1260, 590, 320], battery: [1010, 778, 230], switch: [1050, 620, 150],
+    speaker: [300, 330, 120],
   };
+  const BATTERY = { charger: [1260, 590, 320], battery: [1010, 778, 230], switch: [1050, 620, 150] };
+  let place = BASE;
   const pin = (part, name) => {
     const p = P[part], [x, y, w] = place[part], s = w / p.crop[2], [px, py] = p.pins[name];
     return [x + (px - p.crop[0]) * s, y + (py - p.crop[1]) * s];
@@ -69,6 +73,9 @@
       <rect x="784" y="180" width="12" height="18" rx="3"/><rect x="829" y="180" width="12" height="18" rx="3"/><rect x="874" y="180" width="12" height="18" rx="3"/></g>
     <g fill="#fff" font-size="10.5" font-weight="700" text-anchor="middle"><text x="790" y="174">VCC</text><text x="835" y="174">I/O</text><text x="880" y="174">GND</text></g>`;
 
+  function build(variant) {
+  const battery = variant !== 2;
+  place = battery ? Object.assign({}, BASE, BATTERY) : BASE;
   let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Be Vietnam Pro, Segoe UI, sans-serif" role="img" aria-label="Sơ đồ đấu dây Mochi với ảnh linh kiện thật">`;
   s += `<rect width="${W}" height="${H}" fill="#ffffff"/>`;
   for (const k of Object.keys(place)) s += photo(k);
@@ -82,9 +89,13 @@
   s += label(80, 584, 'Ampli MAX98357A');
   s += `<text x="330" y="812" font-size="12.5" fill="#6d6579">GAIN, SD: để trống</text>`;
   s += label(430, 345, 'Loa');
-  s += label(1260, 582, 'Mạch sạc Type-C');
-  s += label(1385, 872, 'Pin 14250 3.7V');
-  s += label(1050, 612, 'Công tắc gạt');
+  if (battery) {
+    s += label(1260, 582, 'Mạch sạc Type-C');
+    s += label(1385, 872, 'Pin 14250 3.7V');
+    s += label(1050, 612, 'Công tắc gạt');
+  } else {
+    s += `<text x="800" y="686" text-anchor="middle" font-size="13.5" font-weight="600" fill="#9b1c1c">Cấp điện: cắm cáp USB-C (5V) vào cổng trên mạch</text>`;
+  }
 
   // ---------- display (right side): up over the top, then down onto the header ----------
   const disp = [['6', 'CS', 960, 22], ['7', 'DC', 988, 30], ['8', 'RES', 1016, 38], ['9', 'SDA', 1044, 46], ['10', 'SCL', 1072, 54]];
@@ -111,10 +122,16 @@
   s += wire([sx - 4, sy], ['y595'], pin('amp', 'SPK-'), C.black);
   s += wire([sx + 4, sy], ['y610'], pin('amp', 'SPK+'), C.red);
 
-  // ---------- battery -> charger -> switch ----------
-  s += wire(pin('battery', '+'), ['y885'], pin('charger', 'B+'), C.red);
-  s += wire(pin('battery', '-'), [], pin('charger', 'B-'), C.black);
-  s += wire(pin('charger', 'OUT+'), ['x' + pin('switch', 'COM')[0]], pin('switch', 'COM'), C.bat);
+  // ---------- power ----------
+  if (battery) {  // battery -> charger -> switch -> 5V
+    s += wire(pin('battery', '+'), ['y885'], pin('charger', 'B+'), C.red);
+    s += wire(pin('battery', '-'), [], pin('charger', 'B-'), C.black);
+    s += wire(pin('charger', 'OUT+'), ['x' + pin('switch', 'COM')[0]], pin('switch', 'COM'), C.bat);
+  } else {        // USB-C plug in the C3's port (top edge of the board, centre at x ~808)
+    s += `<rect x="786" y="247" width="44" height="26" rx="6" fill="#c9ccd2" stroke="#7d838c" stroke-width="2"/>` +
+         `<rect x="796" y="255" width="24" height="9" rx="4" fill="#5b6068"/>`;
+    s += tag([786, 260], -64, 0, 'USB-C 5V', C.v5, 'end');
+  }
 
   // ---------- power tags ----------
   s += tag(pin('c3', '5V'), -22, 0, '5V', C.v5, 'end');
@@ -130,20 +147,31 @@
   s += tag(pin('screen', 'BLK'), 85, 0, 'trống', C.na);
   s += tag(touch.pins.VCC, 0, 34, '3V3', C.v33, 'middle');
   s += tag(touch.pins.GND, 0, 34, 'GND', C.gnd, 'middle');
-  s += tag(pin('charger', 'OUT-'), 0, -60, 'GND của C3', C.gnd, 'middle');
-  s += tag(pin('switch', 'A'), -24, 0, '5V của C3', C.v5, 'end');
+  if (battery) {
+    s += tag(pin('charger', 'OUT-'), 0, -60, 'GND của C3', C.gnd, 'middle');
+    s += tag(pin('switch', 'A'), -24, 0, '5V của C3', C.v5, 'end');
 
-  // pin names on the charger / switch (their photos have no readable labels)
-  const small = (at, dx, dy, t) => `<text x="${at[0] + dx}" y="${at[1] + dy}" font-size="12" font-weight="700" fill="#2b2533">${t}</text>`;
-  s += small(pin('charger', 'B+'), 8, -8, 'B+') + small(pin('charger', 'B-'), 10, -6, 'B−') + small(pin('charger', 'OUT+'), 10, 4, 'OUT+');
-  s += small(pin('battery', '+'), -4, -14, '+') + small(pin('battery', '-'), -8, -14, '−');
+    // pin names on the charger / switch (their photos have no readable labels)
+    const small = (at, dx, dy, t) => `<text x="${at[0] + dx}" y="${at[1] + dy}" font-size="12" font-weight="700" fill="#2b2533">${t}</text>`;
+    s += small(pin('charger', 'B+'), 8, -8, 'B+') + small(pin('charger', 'B-'), 10, -6, 'B−') + small(pin('charger', 'OUT+'), 10, 4, 'OUT+');
+    s += small(pin('battery', '+'), -4, -14, '+') + small(pin('battery', '-'), -8, -14, '−');
+  }
 
   s += '</svg>';
+  return s;
+  }
+
   const host = document.getElementById('c3photo');
   if (!host) return;
-  host.innerHTML = s + '<span class="zoomhint">⛶ Bấm để phóng to</span>';
+  const hint = (on) => on ? '✕ Bấm hoặc Esc để thu nhỏ' : '⛶ Bấm để phóng to';
+  const toggle = (on) => { host.classList.toggle('full', on); document.body.style.overflow = on ? 'hidden' : ''; host.querySelector('.zoomhint').textContent = hint(on); };
   host.title = 'Bấm để phóng to / thu nhỏ';
-  const toggle = (on) => { host.classList.toggle('full', on); document.body.style.overflow = on ? 'hidden' : ''; host.querySelector('.zoomhint').textContent = on ? '✕ Bấm hoặc Esc để thu nhỏ' : '⛶ Bấm để phóng to'; };
   host.addEventListener('click', () => toggle(!host.classList.contains('full')));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') toggle(false); });
+  window.MochiC3Diagram = {
+    show(variant) {
+      host.innerHTML = build(variant) + `<span class="zoomhint">${hint(host.classList.contains('full'))}</span>`;
+    },
+  };
+  window.MochiC3Diagram.show(1);
 })();
