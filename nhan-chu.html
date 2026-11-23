@@ -8,11 +8,12 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#fbf6f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17132a">
 <meta name="apple-mobile-web-app-title" content="Mochi AI Lab">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261123">
+<link rel="stylesheet" href="site.css?v=20261124">
 <style>
 :root { --screen: #0b0b10; --body: #f7b6cb; }
 body { font-size: 16px; }
@@ -192,9 +193,10 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 
   <p class="note">Chữ đi qua một máy chủ nhắn tin công cộng miễn phí (broker.emqx.io) và không được mã hoá trên đoạn tới Mochi, nên đừng gửi thông tin riêng tư. Ai biết mã của Mochi cũng gửi được chữ, vì vậy đừng chia sẻ mã. Phông chữ của Mochi chưa có đủ mọi chữ tiếng Việt có dấu và biểu tượng cảm xúc; chữ thiếu sẽ bị bỏ trống.</p>
 </main>
+<footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261123"></script>
+<script src="site.js?v=20261124"></script>
 <script>
 // Must match mochi_remote.h in the firmware
 const BROKER = 'wss://broker.emqx.io:8084/mqtt';

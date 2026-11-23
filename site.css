@@ -8,28 +8,32 @@
   --w-clk: #e07b00; --w-ws: #d23f8a; --w-data: #2f6fd6; --w-disp: #7a4fd0; --w-touch: #1d9a6a;
   --p33: #d63a3a; --p5: #9b1c1c; --gnd: #5b5b5b;
   --board: #1f2a44; --board-text: #e9eefc; --module: #fbf7fb; --module-stroke: #d9cfe0;
+  --glow1: color-mix(in srgb, #8a5cf0 14%, transparent); --glow2: color-mix(in srgb, #d24b84 14%, transparent); --glow3: transparent;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #141219; --bg2: #1b1424; --surface: rgba(32,28,40,.85); --surface-solid: #201c28;
-    --text: #efebf5; --muted: #a8a0b6; --line: #332e3e; --shadow: 0 10px 30px rgba(0,0,0,.35);
-    --accent: #f27aab; --accent2: #a98af7; --accent-text: #1a0f1f; --code: #2a2533;
-    --module: #29243a; --module-stroke: #4a4359; --board: #0d1630; --gnd: #a0a0a0; --p5: #e06a6a;
+    --bg: #17132a; --bg2: #0d0b17; --surface: rgba(36,30,56,.72); --surface-solid: #241e38;
+    --text: #f4f0fb; --muted: #b3abc8; --line: rgba(255,255,255,.09); --shadow: 0 14px 40px rgba(0,0,0,.45);
+    --accent: #ff8fbd; --accent2: #b49cff; --accent-text: #1a0f1f; --code: #2c2542;
+    --module: #2a2342; --module-stroke: #4a4066; --board: #2f2a55; --board-text: #ece8ff; --gnd: #b9b4c4; --p5: #ff8a8a;
+    --glow1: rgba(180,156,255,.20); --glow2: rgba(255,143,189,.13); --glow3: rgba(94,200,255,.07);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #141219; --bg2: #1b1424; --surface: rgba(32,28,40,.85); --surface-solid: #201c28;
-  --text: #efebf5; --muted: #a8a0b6; --line: #332e3e; --shadow: 0 10px 30px rgba(0,0,0,.35);
-  --accent: #f27aab; --accent2: #a98af7; --accent-text: #1a0f1f; --code: #2a2533;
-  --module: #29243a; --module-stroke: #4a4359; --board: #0d1630; --gnd: #a0a0a0; --p5: #e06a6a;
+  --bg: #17132a; --bg2: #0d0b17; --surface: rgba(36,30,56,.72); --surface-solid: #241e38;
+  --text: #f4f0fb; --muted: #b3abc8; --line: rgba(255,255,255,.09); --shadow: 0 14px 40px rgba(0,0,0,.45);
+  --accent: #ff8fbd; --accent2: #b49cff; --accent-text: #1a0f1f; --code: #2c2542;
+  --module: #2a2342; --module-stroke: #4a4066; --board: #2f2a55; --board-text: #ece8ff; --gnd: #b9b4c4; --p5: #ff8a8a;
+  --glow1: rgba(180,156,255,.20); --glow2: rgba(255,143,189,.13); --glow3: rgba(94,200,255,.07);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0; min-height: 100vh; color: var(--text);
   font: 15px/1.55 "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
   background:
-    radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--accent2) 14%, transparent), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%),
+    radial-gradient(1200px 600px at 85% -10%, var(--glow1), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, var(--glow2), transparent 60%),
+    radial-gradient(700px 500px at 50% 45%, var(--glow3), transparent 70%),
     linear-gradient(180deg, var(--bg), var(--bg2));
   background-attachment: fixed;
 }
@@ -46,7 +50,9 @@ header {
 .brand span { color: var(--accent); }
 .menu { display: flex; gap: 4px; }
 .menu a { color: var(--muted); text-decoration: none; font-weight: 600; padding: 8px 14px; border-radius: 10px; white-space: nowrap; }
-.menu a:hover, .menu a.active { color: var(--text); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.menu a:hover { color: var(--text); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.menu a.active { color: var(--accent); font-weight: 800; background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: inset 0 -2px 0 var(--accent); }
 .chip { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
   padding: 6px 12px; border-radius: 999px; background: var(--surface-solid); border: 1px solid var(--line); }
 .chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); display: inline-block; }
@@ -76,5 +82,30 @@ header {
 .tag.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
 .tag.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
 .hidden { display: none !important; }
+/* ---------- cards (home page, nap-firmware.html; filled by cards.js) ---------- */
+section { margin-top: 30px; scroll-margin-top: 120px; }
+section > h2 { margin: 0 0 4px; font-size: 22px; letter-spacing: -.3px; }
+section > p { margin: 0 0 14px; color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 18px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); color: var(--text); text-decoration: none;
+  transition: transform .15s, border-color .15s; }
+a.card:hover, .card.link:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.card .top { display: flex; align-items: center; gap: 12px; }
+.icon { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; flex: none;
+  background: var(--board); color: var(--board-text); font-weight: 800; font-size: 13px; }
+.icon.feature { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; font-size: 22px; }
+.card h3 { margin: 0; font-size: 18px; line-height: 1.3; }
+.card h3 small { display: block; font-size: 13px; font-weight: 500; color: var(--muted); }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.card .go { margin-top: auto; font-weight: 700; color: var(--accent); }
+.card.soon { opacity: .7; }
+.card .cover { position: absolute; inset: 0; border-radius: inherit; }  /* whole card clickable */
+.variants { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; position: relative; z-index: 1; }
+.variants a { flex: 1; min-width: 130px; text-decoration: none; color: var(--text); font-weight: 700; font-size: 14px;
+  padding: 10px 12px; border-radius: 12px; background: var(--surface-solid); border: 1px solid var(--line); }
+.variants a small { display: block; font-weight: 500; color: var(--muted); font-size: 12.5px; }
+.variants a:hover { border-color: var(--accent); }
+
 footer { text-align: center; color: var(--muted); font-size: 13px; padding: 10px 16px 24px; }
 footer a { color: inherit; }

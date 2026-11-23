@@ -8,11 +8,12 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#fbf6f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17132a">
 <meta name="apple-mobile-web-app-title" content="Mochi AI Lab">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261123">
+<link rel="stylesheet" href="site.css?v=20261124">
 <style>
 .crumb { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
 .crumb a { color: inherit; }
@@ -44,7 +45,7 @@ td:first-child { font-weight: 600; white-space: nowrap; }
 <div class="wrap">
   <div class="hero">
     <div>
-      <p class="crumb"><a href="./">Trang chủ</a> › <a href="./#nap-firmware">Nạp firmware</a> › ESP32-S3</p>
+      <p class="crumb"><a href="./">Trang chủ</a> › <a href="nap-firmware.html">Nạp firmware</a> › ESP32-S3</p>
       <h1>Mochi <b>ESP32-S3</b> N16R8 <span class="tag warn">Sắp có</span></h1>
       <p>16 MB flash · 8 MB PSRAM. Sơ đồ đấu dây dự kiến, firmware đang chuẩn bị.</p>
     </div>
@@ -135,8 +136,8 @@ td:first-child { font-weight: 600; white-space: nowrap; }
     </main>
   </div>
 </div>
-<footer>Mochi AI Lab · Mochi AI chạy trên firmware xiaozhi-esp32</footer>
-<script src="site.js?v=20261123"></script>
+<footer></footer>
+<script src="site.js?v=20261124"></script>
 <script>
 document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.seg button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });

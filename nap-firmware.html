@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nạp firmware · Mochi AI Lab</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#fbf6f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17132a">
+<meta name="apple-mobile-web-app-title" content="Mochi AI Lab">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=20261124">
+<style>
+.steps { display: flex; gap: 8px; flex-wrap: wrap; }
+.steps span { font-size: 13px; font-weight: 600; color: var(--muted); background: var(--surface); border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px; }
+.steps b { color: var(--accent); margin-right: 4px; }
+</style>
+</head>
+<body>
+<header data-active="firmware"></header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Nạp <b>firmware</b></h1>
+      <p>Chọn mạch của Mochi. Mỗi mạch có nút nạp ngay trên trình duyệt (Chrome hoặc Edge trên máy tính), sơ đồ đấu dây bằng ảnh linh kiện thật và bảng chân.</p>
+    </div>
+    <div class="steps"><span><b>1</b>Chọn mạch</span><span><b>2</b>Đấu dây</span><span><b>3</b>Nạp firmware</span><span><b>4</b>Kết nối Wi-Fi</span></div>
+  </div>
+
+  <!-- the cards come from cards.js (add boards there) -->
+  <div class="cards" data-cards="boards"></div>
+</div>
+<footer></footer>
+<script src="site.js?v=20261124"></script>
+<script src="cards.js?v=20261124"></script>
+</body>
+</html>

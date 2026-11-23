@@ -1,11 +1,11 @@
-// Mochi AI Lab: the top bar (logo + menu) shared by every page.
+// Mochi AI Lab: the top bar (logo + menu) and the footer shared by every page.
 // A page writes <header data-active="..."> (plus anything page-specific inside it, such as
 // the browser-check chip); this fills in the logo and the menu in front of that content.
 // To add a page to the menu, add one line to MENU.
 (function () {
   const MENU = [
     { id: 'home', href: './', text: 'Trang chủ' },
-    { id: 'firmware', href: './#nap-firmware', text: 'Nạp firmware' },
+    { id: 'firmware', href: 'nap-firmware.html', text: 'Nạp firmware' },
     { id: 'text', href: 'nhan-chu.html', text: 'Nhắn chữ' },
   ];
   const LOGO = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="10" width="56" height="48" rx="22" fill="#f7b6cb"/>' +
@@ -31,4 +31,11 @@
     nav.appendChild(a);
   }
   header.prepend(brand, nav);
+
+  // footer: owner and credits, the same on every page
+  const footer = document.querySelector('footer');
+  if (footer) {
+    footer.innerHTML = '© ' + new Date().getFullYear() + ' <b>Nguyễn Nam</b> · Mochi AI Lab' +
+      '<br>Mochi AI chạy trên firmware <a href="https://github.com/78/xiaozhi-esp32" rel="noopener">xiaozhi-esp32</a>';
+  }
 })();
