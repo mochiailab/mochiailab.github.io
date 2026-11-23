@@ -1,4 +1,4 @@
-# NGUYENNAM.ai
+# Mochi AI Lab
 
 Trang nạp firmware **Mochi AI** (ESP32-C3 SuperMini) ngay trên trình duyệt, kèm sơ đồ đấu dây bằng ảnh linh kiện thật.
 
