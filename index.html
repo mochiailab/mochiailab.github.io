@@ -15,6 +15,9 @@
 <script>
   // links to sections of the old one-page flasher now live on the ESP32-C3 page
   if (['#nap', '#daydien', '#luuy'].includes(location.hash)) location.replace('esp32-c3.html' + location.hash);
+  // the QR code on Mochi's screen (menu > Code web): https://mochiailab.github.io/#<key>
+  // (after '#', so the key never reaches the server); Cài đặt fills it in and connects
+  else if (/^#[A-Za-z0-9]{12}$/.test(location.hash)) location.replace('cai-dat.html' + location.hash);
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

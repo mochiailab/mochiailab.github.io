@@ -312,8 +312,17 @@ $('wxCity').addEventListener('keydown', (e) => { if (e.key === 'Enter') findCity
 $('btnConnect').addEventListener('click', connect);
 $('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
 window.MochiLink.keyInput($('code'));
-const saved = window.MochiLink.savedCode();
-if (KEY_RE.test(saved)) { $('code').value = prettyKey(saved); connect(); }
-else if (OLD_CODE_RE.test(saved)) { $('code').value = saved; connect(); }
+// opened from the QR code on Mochi (index.html passes #<key> on): take the key, drop it from the URL
+const fromQr = normKey(location.hash);
+if (KEY_RE.test(fromQr) && location.hash.length === 13) {
+  history.replaceState(null, '', location.pathname);
+  $('code').value = prettyKey(fromQr);
+  connect();
+  toast('Đã nhận mã từ Mochi ✓');
+} else {
+  const saved = window.MochiLink.savedCode();
+  if (KEY_RE.test(saved)) { $('code').value = prettyKey(saved); connect(); }
+  else if (OLD_CODE_RE.test(saved)) { $('code').value = saved; connect(); }
+}
 
 })();

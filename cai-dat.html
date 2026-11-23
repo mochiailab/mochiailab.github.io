@@ -31,7 +31,7 @@
       <button class="primary" id="btnConnect">Kết nối</button>
     </div>
     <label class="remember"><input type="checkbox" id="remember" checked> Ghi nhớ mã trên máy này <small>(bỏ chọn khi dùng máy người khác: mã mất khi đóng tab)</small></label>
-    <div class="status" id="status"><i></i><div><b id="stTitle">Chưa kết nối</b><small id="stSub">Xem mã trên Mochi: giữ nút chạm 2 giây, chạm tới mục Code web (<a href="#doi-ma">hướng dẫn</a>)</small></div></div>
+    <div class="status" id="status"><i></i><div><b id="stTitle">Chưa kết nối</b><small id="stSub">Giữ nút chạm 2 giây, chạm tới mục Code web rồi <b>quét mã QR</b> trên màn Mochi bằng camera điện thoại (<a href="#doi-ma">hướng dẫn</a>)</small></div></div>
   </div>
 
   <div class="card" id="oldFw" hidden>
@@ -90,9 +90,9 @@
     <p class="note" style="margin:0 0 10px">Mã 12 ký tự (dạng <code>ABCD-EFGH-JKMN</code>) là "chìa khoá" để nhắn chữ và điều khiển Mochi. Ai biết mã cũng điều khiển được, nên nếu lỡ để lộ, hãy đổi mã mới ngay trên Mochi.</p>
     <ol class="steps">
       <li><b>Mở menu:</b> giữ nút chạm trên Mochi khoảng 2 giây.</li>
-      <li><b>Tới mục Code web:</b> chạm nhẹ từng lần cho tới khi màn hiện <code>Code web</code> và một mã dạng <code>ABCD-EFGH-JKMN</code>. Đây là mã hiện tại.</li>
+      <li><b>Tới mục Code web:</b> chạm nhẹ từng lần cho tới khi màn hiện <code>Code web</code>: bên trái là mã QR, bên phải là mã 12 ký tự. <b>Quét mã QR bằng camera điện thoại</b> là trang này tự mở, tự điền mã và kết nối; hoặc gõ mã vào ô ở trên.</li>
       <li><b>Bắt đầu đổi:</b> ở mục đó giữ nút chạm 2 giây. Màn hỏi <code>Tạo code mới?</code></li>
-      <li><b>Xác nhận:</b> giữ thêm 2 giây nữa (trong vòng 10 giây). Màn hiện <code>Code web mới</code> kèm mã mới khoảng 15 giây, hãy ghi lại.</li>
+      <li><b>Xác nhận:</b> giữ thêm 2 giây nữa (trong vòng 10 giây). Màn hiện <code>Code mới</code> kèm mã QR và mã mới khoảng 15 giây: quét QR hoặc ghi lại.</li>
       <li><b>Dùng mã mới:</b> trên trang này hoặc trang Nhắn chữ, bấm <b>Đổi mã</b> và nhập mã mới.</li>
     </ol>
     <p class="note" style="margin:10px 0 0">Mã cũ hết dùng ngay lập tức. Mã mới chỉ hiện trên màn Mochi, không bao giờ được gửi qua mạng, nên người đang giữ mã cũ không thể biết. Lỡ giữ nhầm? Chạm sang mục khác hoặc chờ 10 giây là không đổi.</p>
@@ -106,6 +106,6 @@
 
 <script src="site.js?v=20261128"></script>
 <script src="mochi-link.js?v=20261133"></script>
-<script src="mochi-panel.js?v=20261135"></script>
+<script src="mochi-panel.js?v=20261136"></script>
 </body>
 </html>
