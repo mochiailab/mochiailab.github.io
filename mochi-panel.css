@@ -1,5 +1,14 @@
 /* Mochi AI Lab: styles of the remote-control pages (giao-dien.html, cai-dat.html) */
 body { font-size: 16px; }
+/* "Nuôi Mochi" */
+.pet-mood { display: flex; gap: 12px; align-items: center; margin: 4px 0 10px; }
+.pet-mood > span { font-size: 34px; line-height: 1; }
+.pet-mood b { font-size: 17px; display: block; } .pet-mood small { color: var(--muted); font-size: 13px; }
+.pet-stat { display: grid; grid-template-columns: 118px 1fr 40px; gap: 8px; align-items: center; margin: 7px 0; font-size: 14px; }
+.pet-stat > span:last-child { text-align: right; font-weight: 700; }
+.pet-bar { height: 10px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.pet-bar i { display: block; height: 100%; width: 0; border-radius: 6px; transition: width .4s; }
+#petCard.off .pet-stat, #petCard.off #foods { opacity: .4; }
 /* firmware update */
 .update { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px; margin-bottom: 4px; border-radius: 14px;
   background: color-mix(in srgb, var(--accent) 8%, var(--surface-solid)); border: 1px solid var(--line); }

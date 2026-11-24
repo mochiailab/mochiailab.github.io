@@ -20,8 +20,8 @@
   ];
   const FEATURES = [
     {
-      icon: '🎨', feature: true, title: 'Giao diện Mochi', sub: 'Màu, đồng hồ, thời tiết',
-      text: 'Đổi màu Mochi, bật đồng hồ, chọn kiểu và màu nền đồng hồ, xem thời tiết, giờ ngủ.',
+      icon: '🎨', feature: true, title: 'Giao diện & nuôi Mochi', sub: 'Màu, đồng hồ, thời tiết, nuôi Mochi',
+      text: 'Cho Mochi ăn, xem Mochi đói hay buồn, đổi màu, bật đồng hồ, xem thời tiết, giờ ngủ, bật tắt các tính năng.',
       href: 'giao-dien.html', go: 'Mở ›',
     },
     {

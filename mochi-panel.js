@@ -76,18 +76,49 @@ function render() {
   document.querySelectorAll('#colors button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.color));
   $('clock').checked = state.clock === 1;
   $('volume').value = state.volume; $('volVal').textContent = state.volume + '%';
+  renderPet();
   if (typeof state.bright === 'number') { $('bright').value = state.bright; $('brightVal').textContent = state.bright + '%'; }
   else $('brightVal').textContent = 'cần bản mới';  // firmware before the brightness setting
   const bedOn = state.bed_s !== state.bed_e;
   $('bedOn').checked = bedOn; $('bedHours').hidden = !bedOn;
   if (bedOn) { $('bedS').value = state.bed_s; $('bedE').value = state.bed_e; }
   $('sleepNow').checked = !!state.sleep;
-  document.querySelectorAll('#startle button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.startle));
+  // "call to talk" (replaced the startle): state.call = sensitivity level, 0 = off
+  const call = typeof state.call === 'number' ? state.call : 0;
+  $('callOn').checked = call > 0; $('callLevelRow').hidden = $('callNote').hidden = !(call > 0);
+  if (call > 0) lastCall = call;
+  document.querySelectorAll('#callLevel button').forEach((b) => b.classList.toggle('on', +b.dataset.v === call));
   const t = state.timer;
   $('timerLeft').textContent = t > 0 ? 'Còn ' + Math.floor(t / 60) + ' phút ' + String(t % 60).padStart(2, '0') + ' giây' : 'Không có hẹn giờ';
   $('info').textContent = 'Giờ trên Mochi: ' + state.time + ' · lõi xiaozhi ' + state.fw + (state.sleep ? ' · Đang ngủ' : '');
   renderUpdate();
 }
+
+// ---------- "Nuôi Mochi" (firmware: mochi_pet.h, state.pet) ----------
+const MOODS = [['🙂', 'Mochi đang ổn'], ['🥺', 'Mochi đang đói'], ['😪', 'Mochi mệt rồi'],
+  ['💬', 'Mochi cần tâm sự'], ['😢', 'Mochi đang buồn'], ['🤩', 'Mochi vui lắm']];
+function renderPet() {
+  const p = state.pet;
+  $('tsnd').checked = state.tsnd !== 0;
+  if (!p) { $('petMood').textContent = 'Cần cập nhật firmware mới'; $('petCard').classList.add('off'); return; }
+  $('petOn').checked = p.on === 1; $('petSnd').checked = p.snd === 1;
+  $('petCard').classList.toggle('off', p.on !== 1);
+  const [face, text] = p.on === 1 ? (MOODS[p.m] || MOODS[0]) : ['💤', 'Đang tắt nuôi Mochi'];
+  $('petFace').textContent = face; $('petMood').textContent = text;
+  const a = p.ate;
+  $('petAte').textContent = a < 0 ? '' : 'Ăn lần cuối: ' + (a < 1 ? 'vừa xong' : a < 60 ? a + ' phút trước' : Math.floor(a / 60) + ' tiếng trước');
+  for (const [k, id] of [['f', 'petF'], ['j', 'petJ'], ['t', 'petT'], ['e', 'petE']]) {
+    $(id).style.width = p[k] + '%'; $(id + 'v').textContent = p[k] + '%';
+  }
+}
+$('foods').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (state && state.pet && state.pet.f >= 95) { toast('Mochi no rồi, để lát nữa nhé 😊'); return; }
+  if (send('feed', { v: +b.dataset.food })) toast('Mochi đang ăn ' + b.textContent.replace(/^\S+\s/, '').toLowerCase() + ' 😋');
+});
+$('petOn').addEventListener('change', () => { if (send('pet_on', { v: $('petOn').checked ? 1 : 0 })) toast($('petOn').checked ? 'Đã bật nuôi Mochi' : 'Đã tắt nuôi Mochi'); });
+$('petSnd').addEventListener('change', () => { if (send('pet_snd', { v: $('petSnd').checked ? 1 : 0 })) toast($('petSnd').checked ? 'Mochi sẽ kêu khi đói / buồn' : 'Mochi sẽ không kêu nữa'); });
+$('tsnd').addEventListener('change', () => { if (send('tsnd', { v: $('tsnd').checked ? 1 : 0 })) toast($('tsnd').checked ? 'Đã bật tiếng khi chạm' : 'Đã tắt tiếng khi chạm'); });
 
 function send(cmd, extra) {
   if (!mq || !mq.ready) return false;
@@ -217,9 +248,17 @@ $('sleepNow').addEventListener('change', () => {
   if (send(on ? 'sleep' : 'wake')) toast(on ? 'Mochi sẽ đi ngủ' : 'Đã đánh thức Mochi');
   else $('sleepNow').checked = !on;
 });
-$('startle').addEventListener('click', (e) => {
+let lastCall = 1500;
+$('callOn').addEventListener('change', () => {
+  const on = $('callOn').checked;
+  if (!send('call', { v: on ? lastCall : 0 })) { $('callOn').checked = !on; return; }
+  $('callLevelRow').hidden = $('callNote').hidden = !on;
+  toast(on ? 'Gọi "Mochi ơi!" là Mochi nghe luôn' : 'Đã tắt gọi để trò chuyện');
+});
+$('callLevel').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return;
-  if (send('startle', { v: +b.dataset.v })) toast('Giật mình: ' + b.textContent);
+  lastCall = +b.dataset.v;
+  if (send('call', { v: lastCall })) toast('Độ nhạy khi gọi: ' + b.textContent);
 });
 $('wifi').addEventListener('click', () => {
   if (!confirm('Mochi sẽ ngắt Wi-Fi nhà và phát Wi-Fi "N-Mochi_AI_Lab-xxxx" để bạn chọn mạng khác. Trong lúc đó trang này không điều khiển được Mochi. Tiếp tục?')) return;

@@ -15,14 +15,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20261133">
-<link rel="stylesheet" href="mochi-panel.css?v=20261134">
+<link rel="stylesheet" href="mochi-panel.css?v=20261138">
 </head>
 <body>
 <header data-active="look"></header>
 
 <main>
   <h1>Giao diện <b>Mochi</b></h1>
-  <p class="lead">Màu Mochi, chế độ và kiểu đồng hồ, màu nền đồng hồ, thời tiết, giờ ngủ và giật mình. Mọi thay đổi được Mochi lưu lại.</p>
+  <p class="lead">Màu Mochi, chế độ và kiểu đồng hồ, màu nền đồng hồ, thời tiết, giờ ngủ, nuôi Mochi và các tính năng. Mọi thay đổi được Mochi lưu lại.</p>
 
   <div class="card">
     <label class="lbl" for="code">Mã của Mochi</label>
@@ -35,6 +35,27 @@
   </div>
 
   <fieldset id="controls" disabled>
+  <div class="card" id="petCard">
+    <h2><span>🐣</span>Nuôi Mochi</h2>
+    <div class="pet-mood"><span id="petFace">🙂</span><div><b id="petMood">–</b><small id="petAte"></small></div></div>
+    <div class="pet-stat"><span>🍙 No bụng</span><div class="pet-bar"><i id="petF" style="background:#ff9a5a"></i></div><span id="petFv">–</span></div>
+    <div class="pet-stat"><span>💗 Vui vẻ</span><div class="pet-bar"><i id="petJ" style="background:#ff7fb0"></i></div><span id="petJv">–</span></div>
+    <div class="pet-stat"><span>💬 Tâm sự</span><div class="pet-bar"><i id="petT" style="background:#7fb8ff"></i></div><span id="petTv">–</span></div>
+    <div class="pet-stat"><span>😴 Năng lượng</span><div class="pet-bar"><i id="petE" style="background:#5ed3b4"></i></div><span id="petEv">–</span></div>
+    <div class="row" id="foods"><button class="grow" data-food="0">🍡 Bánh mochi</button><button class="grow" data-food="1">🍓 Trái cây</button><button class="grow" data-food="2">🥛 Sữa</button></div>
+    <p class="note" style="margin:8px 0 0">Mochi đói sau khoảng 6 tiếng. Vuốt ve làm Mochi vui, trò chuyện để Mochi đỡ cô đơn, ngủ để lấy lại sức. Khi Mochi cần tâm sự, chạm 2 lần là Mochi mở lời.</p>
+  </div>
+
+  <div class="card">
+    <h2><span>✨</span>Tính năng</h2>
+    <div class="row"><span class="lbl grow">Nuôi Mochi<br><span class="muted" style="font-weight:400">Đói, vui, buồn, cần tâm sự, mệt</span></span><label class="switch"><input type="checkbox" id="petOn" aria-label="Nuôi Mochi"><span></span></label></div>
+    <div class="row"><span class="lbl grow">Kêu khi đói / buồn<br><span class="muted" style="font-weight:400">Tối đa 2 lần mỗi giờ, không kêu ban đêm</span></span><label class="switch"><input type="checkbox" id="petSnd" aria-label="Kêu khi đói hoặc buồn"><span></span></label></div>
+    <div class="row"><span class="lbl grow">Gọi để trò chuyện<br><span class="muted" style="font-weight:400">Gọi to "Mochi ơi!" là Mochi nghe luôn, không cần "Hi ESP"</span></span><label class="switch"><input type="checkbox" id="callOn" aria-label="Gọi để trò chuyện"><span></span></label></div>
+    <div class="row" id="callLevelRow"><span class="lbl grow">Độ nhạy khi gọi</span><span class="seg" id="callLevel"><button data-v="3000">Ít</button><button data-v="1500">Vừa</button><button data-v="800">Nhạy</button></span></div>
+    <p class="note" id="callNote" style="margin:0 0 6px">Mochi nghe một tiếng gọi dài khoảng nửa giây đến một giây rưỡi. Vỗ tay, tiếng sập cửa quá ngắn, tivi hay nhạc kêu liên tục thì Mochi bỏ qua. Nếu Mochi hay tự nghe nhầm, chọn "Ít"; gọi mãi không nghe, chọn "Nhạy".</p>
+    <div class="row"><span class="lbl grow">Tiếng khi chạm<br><span class="muted" style="font-weight:400">"pi-pu-pi" và "kyu-kyu-kyu"</span></span><label class="switch"><input type="checkbox" id="tsnd" aria-label="Tiếng khi chạm"><span></span></label></div>
+  </div>
+
   <div class="card">
     <h2><span>🎨</span>Màu Mochi</h2>
     <div class="swatches" id="colors"></div>
@@ -77,7 +98,7 @@
   </div>
 
   <div class="card">
-    <h2><span>🌙</span>Ngủ & giật mình</h2>
+    <h2><span>🌙</span>Ngủ</h2>
     <div class="row">
       <span class="lbl grow">Ngủ đêm<br><span class="muted" style="font-weight:400">Ban đêm Mochi tự ngủ, màn tối</span></span>
       <label class="switch"><input type="checkbox" id="bedOn" aria-label="Ngủ đêm"><span></span></label>
@@ -91,10 +112,6 @@
       <span class="lbl grow">Ngủ ngay<br><span class="muted" style="font-weight:400">Tắt để đánh thức Mochi</span></span>
       <label class="switch"><input type="checkbox" id="sleepNow" aria-label="Ngủ ngay"><span></span></label>
     </div>
-    <div class="row">
-      <span class="lbl">Giật mình khi có tiếng động to</span>
-      <span class="seg" id="startle"><button data-v="0">Tắt</button><button data-v="3000">Ít</button><button data-v="1500">Vừa</button><button data-v="800">Nhiều</button></span>
-    </div>
   </div>
   </fieldset>
 
@@ -105,6 +122,6 @@
 
 <script src="site.js?v=20261128"></script>
 <script src="mochi-link.js?v=20261133"></script>
-<script src="mochi-panel.js?v=20261137"></script>
+<script src="mochi-panel.js?v=20261139"></script>
 </body>
 </html>
