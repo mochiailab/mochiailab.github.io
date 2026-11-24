@@ -20,8 +20,11 @@ function toast(msg) {
 function setStatus(kind, title, sub) {
   $('status').className = 'status ' + kind; $('stTitle').textContent = title; $('stSub').textContent = sub;
 }
+const PILL_MOODS = ['🙂', '🥺', '😪', '💬', '😢', '🤩'];  // the header pill (site.js)
 function refreshStatus() {
   const ready = !!(mq && mq.connected);
+  if (window.MochiSite) window.MochiSite.status(ready ? online : null, state && state.pet && state.pet.on === 1 ? PILL_MOODS[state.pet.m] : '');
+  if (window.MochiTheme && state) window.MochiTheme.body(state.color);
   $('btnConnect').textContent = ready ? 'Đổi mã' : 'Kết nối';
   $('controls').disabled = !(ready && online && gotState);
   if (!ready) return;

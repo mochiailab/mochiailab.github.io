@@ -109,7 +109,7 @@ class Link {
     this.k = await deriveKeys(this.key);
     if (this.closed) return;
     this.mq = new Mqtt(BROKER, 'web-' + Math.random().toString(36).slice(2, 10), (tp, payload) => this.got(tp, payload), (st) => {
-      if (st === 'ready') ['status', 'state', 'ack'].forEach((l) => this.mq.subscribe(this.k.base + l));
+      if (st === 'ready') ['status', 'state', 'ack', 'scene'].forEach((l) => this.mq.subscribe(this.k.base + l));
       this.onState(st);
     });
     this.mq.open();

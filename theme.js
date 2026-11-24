@@ -1,0 +1,45 @@
+// Mochi AI Lab: the colour theme, loaded in <head> of every page (before it paints, so there is
+// no flash of the wrong colours). Mode: light / dark / auto (follows the phone); accent: one of
+// ACCENTS, or "Theo Mochi" (the body colour Mochi reports, saved by the pages as mochiBody);
+// glass: the Liquid Glass effect on or off. Kept in localStorage on this browser only.
+// site.js draws the picker; it calls MochiTheme.set(...).
+(function () {
+  const ACCENTS = [
+    ['Hồng Mochi', '#ec5f9b', '#9b6bff'], ['Tím đêm', '#8b5cf6', '#3b82f6'], ['Bạc hà', '#10b981', '#06b6d4'],
+    ['Biển', '#3b82f6', '#06b6d4'], ['Cam đào', '#f97316', '#ec4899'], ['Chanh', '#65a30d', '#14b8a6'],
+    ['Than', '#64748b', '#334155'], ['Theo Mochi', null, null],
+  ];
+  // Mochi's body colours (mochi-link.js BODY_COLORS) as accent pairs for "Theo Mochi"
+  const BODY_ACCENTS = [['#ec6f98', '#b48cf0'], ['#2fbf8a', '#3bb3d6'], ['#e0a31a', '#f08a5a'], ['#9a7cf0', '#5f8cf5'],
+    ['#8a8fa3', '#5d6477'], ['#5d5a6e', '#2b2838']];
+  const KEY = 'mochiTheme';
+  const get = (k, d) => { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } };
+  const put = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  let t = { mode: 'auto', accent: 0, glass: 1 };  // glass on by default (the look the user chose); the picker turns it off
+  try { t = Object.assign(t, JSON.parse(get(KEY, '{}'))); } catch (e) {}
+  const mq = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+
+  function apply() {
+    const root = document.documentElement;
+    const dark = t.mode === 'dark' || (t.mode === 'auto' && mq && mq.matches);
+    root.dataset.theme = dark ? 'dark' : 'light';
+    root.dataset.glass = t.glass ? 'on' : 'off';
+    let pair = ACCENTS[t.accent] || ACCENTS[0];
+    if (!pair[1]) {  // "Theo Mochi"
+      const b = BODY_ACCENTS[+get('mochiBody', 0)] || BODY_ACCENTS[0];
+      pair = [pair[0], b[0], b[1]];
+    }
+    root.style.setProperty('--accent', pair[1]);
+    root.style.setProperty('--accent2', pair[2]);
+    const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+    if (meta) meta.content = dark ? '#120f1f' : '#fdf8fb';
+  }
+  apply();
+  if (mq && mq.addEventListener) mq.addEventListener('change', apply);
+  window.MochiTheme = {
+    ACCENTS, get: () => Object.assign({}, t),
+    set(part) { t = Object.assign(t, part); put(KEY, JSON.stringify(t)); apply(); },
+    // the pages call this with Mochi's body colour; it matters when "Theo Mochi" is picked
+    body(i) { if (String(i) !== get('mochiBody', '')) { put('mochiBody', i); apply(); } },
+  };
+})();

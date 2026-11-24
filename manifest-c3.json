@@ -1,6 +1,6 @@
 {
   "name": "Mochi AI (ESP32-C3 SuperMini)",
-  "version": "2026.11.24-9",
+  "version": "2026.11.25-10",
   "new_install_prompt_erase": false,
   "builds": [
     {

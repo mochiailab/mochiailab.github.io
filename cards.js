@@ -1,4 +1,4 @@
-// Mochi AI Lab: the board and feature cards, shown on the home page and on nap-firmware.html.
+// Mochi AI Lab: the board cards (Cài đặt › Nạp firmware) and feature cards.
 // To add a board or a feature, add one entry here. A page shows a list with
 // <div class="cards" data-cards="boards"></div> (or "features").
 (function () {

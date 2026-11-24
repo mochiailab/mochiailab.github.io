@@ -24,6 +24,7 @@ function setStatus(kind, title, sub) {
 }
 function showMochiState() {
   if (!mq || !mq.connected) return;
+  if (window.MochiSite) window.MochiSite.status(mochiOnline, '');
   if (mochiOnline === true) setStatus('on', 'Mochi đang trực tuyến', 'Mã ' + prettyKey(code) + ' · sẵn sàng nhận chữ');
   else if (mochiOnline === false) setStatus('off', 'Mochi đang tắt hoặc mất mạng', 'Chữ gửi bây giờ sẽ không tới. Bật Mochi rồi thử lại.');
   else setStatus('busy', 'Đã kết nối máy chủ', 'Chưa thấy Mochi mã ' + prettyKey(code) + '. Kiểm tra lại mã hoặc chờ Mochi khởi động xong.');

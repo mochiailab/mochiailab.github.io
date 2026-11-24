@@ -1,0 +1,141 @@
+/* Mochi AI Lab: the Liquid Glass look, on top of site.css (tokens) on every page.
+   theme.js sets data-theme (light / dark), data-glass (on / off) and --accent / --accent2. */
+:root {
+  --bg: #fdf8fb; --bg2: #f4effa; --text: #221d2c; --muted: #6c6480;
+  --a-soft: color-mix(in srgb, var(--accent) 15%, transparent);
+  --a-ink: color-mix(in srgb, var(--accent) 80%, #000);
+  --grad: linear-gradient(135deg, var(--accent), var(--accent2));
+  --accent-text: #fff;
+}
+:root[data-theme="dark"] {
+  --bg: #120f1f; --bg2: #08070f; --text: #f5f1ff; --muted: #aea6c6; --surface-solid: #201b32;
+  --a-ink: color-mix(in srgb, var(--accent) 65%, #fff); --accent-text: #fff;
+}
+body { background: linear-gradient(180deg, var(--bg), var(--bg2)) fixed; padding-bottom: 96px; overflow-x: clip; }
+a { color: var(--a-ink); }
+
+/* colourful, slowly drifting blobs behind everything, so the glass has something to bend */
+.blobs { position: fixed; inset: -10%; z-index: -1; pointer-events: none; filter: blur(42px) saturate(1.2); }
+.blobs i { position: absolute; border-radius: 50%; opacity: .5; animation: blobDrift 24s ease-in-out infinite alternate; }
+.blobs i:nth-child(1) { width: 46vmax; height: 46vmax; left: -8%; top: -6%; background: var(--accent); }
+.blobs i:nth-child(2) { width: 40vmax; height: 40vmax; right: -10%; top: 18%; background: var(--accent2); animation-duration: 30s; }
+.blobs i:nth-child(3) { width: 34vmax; height: 34vmax; left: 20%; bottom: -12%; background: color-mix(in srgb, var(--accent) 50%, #ffd36e); animation-duration: 34s; }
+:root[data-theme="dark"] .blobs i { opacity: .34; }
+@keyframes blobDrift { to { transform: translate(6vmax, 4vmax) scale(1.12); } }
+
+/* ---------- the glass material ---------- */
+:root[data-glass="on"] :is(header, .card, .panel, .update, .dock, .theme-pop, .cmd, .gpill, .gbtn, .variants a, .bgs button, .chips button) {
+  --g-fill: color-mix(in srgb, #fff 18%, transparent);
+  --g-rim: color-mix(in srgb, #fff 60%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 24%, transparent), color-mix(in srgb, #fff 6%, transparent)), var(--g-fill);
+  -webkit-backdrop-filter: blur(18px) saturate(1.9) brightness(1.05);
+  backdrop-filter: blur(18px) saturate(1.9) brightness(1.05);
+  border: 1px solid var(--g-rim);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 85%, transparent), inset 0 -1px 0 color-mix(in srgb, #fff 18%, transparent),
+    inset 0 0 22px color-mix(in srgb, #fff 10%, transparent), 0 10px 30px rgba(40, 20, 70, .12);
+}
+:root[data-glass="on"][data-theme="dark"] :is(header, .card, .panel, .update, .dock, .theme-pop, .cmd, .gpill, .gbtn, .variants a, .bgs button, .chips button) {
+  --g-fill: color-mix(in srgb, #1a1530 40%, transparent);
+  --g-rim: color-mix(in srgb, #fff 16%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 9%, transparent), color-mix(in srgb, #fff 2%, transparent)), var(--g-fill);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 26%, transparent), inset 0 -1px 0 color-mix(in srgb, #fff 6%, transparent),
+    inset 0 0 22px color-mix(in srgb, #fff 4%, transparent), 0 14px 40px rgba(0, 0, 0, .45);
+}
+/* popovers sit over busy content: thicker glass */
+:root[data-glass="on"] :is(.theme-pop, .cmd) { --g-fill: color-mix(in srgb, var(--surface-solid) 84%, transparent) !important; }
+/* a soft specular glare on cards, following the pointer a little */
+:root[data-glass="on"] .card { overflow: hidden; }
+:root[data-glass="on"] .card::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(120% 60% at var(--gx, 30%) -10%, color-mix(in srgb, #fff 40%, transparent), transparent 55%);
+  mix-blend-mode: soft-light;
+}
+.card { position: relative; }
+.card > * { position: relative; z-index: 1; }
+/* real refraction where the browser can (Chrome / Edge / Android): the backdrop bent by a lens */
+@supports (backdrop-filter: url(#lens)) {
+  :root[data-glass="on"] :is(header, .dock) { backdrop-filter: url(#lens) blur(14px) saturate(1.9) brightness(1.05); }
+}
+/* glass off (or the phone asks for less transparency): solid, lighter for old phones */
+:root[data-glass="off"] .blobs { display: none; }
+:root[data-glass="off"] :is(header, .card, .panel, .dock, .theme-pop, .cmd, .gpill, .gbtn) { background: var(--surface-solid); }
+@media (prefers-reduced-motion: reduce) { .blobs i { animation: none; } }
+
+/* ---------- top bar ---------- */
+header { border-width: 0 0 1px; border-radius: 0; }
+.brand span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.menu a.active { color: var(--text); background: var(--a-soft); box-shadow: none; }
+.hdr-tools { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.gpill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--text); text-decoration: none; }
+.gpill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.gpill.on .dot { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 22%, transparent); animation: dotPulse 2s infinite; }
+@keyframes dotPulse { 50% { box-shadow: 0 0 0 7px transparent; } }
+.gbtn { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; cursor: pointer; font-size: 18px; color: var(--text); padding: 0;
+  transition: transform .35s cubic-bezier(.3, 1.6, .5, 1); }
+.gbtn:active { transform: scale(.88); }
+.gsearch { width: auto; padding: 0 12px; gap: 8px; display: flex; font-weight: 600; font-size: 14px; color: var(--muted); min-width: 190px; justify-content: flex-start; }
+.gsearch kbd { margin-left: auto; font: 600 11px system-ui; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--line); }
+@media (max-width: 860px) {
+  header .menu, .gsearch { display: none !important; }
+  header { flex-wrap: nowrap; }
+}
+@media (max-width: 520px) { .gpill .txt { display: none; } }
+
+/* ---------- theme picker ---------- */
+.theme-pop { position: fixed; top: 72px; right: 16px; z-index: 60; width: 300px; padding: 16px; border-radius: 22px; display: none; color: var(--text); }
+.theme-pop.open { display: block; animation: popIn .2s ease-out; }
+@keyframes popIn { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+.theme-pop h4 { margin: 0 0 10px; font-size: 14px; }
+.seg3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 13px; background: var(--a-soft); margin-bottom: 14px; }
+.seg3 button { border: 0; border-radius: 10px; padding: 8px 4px; font-weight: 600; font-size: 13px; background: transparent; color: var(--muted); cursor: pointer; }
+.seg3 button.on { background: var(--surface-solid); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.sw { border: 0; background: none; padding: 0; cursor: pointer; font-weight: 600; font-size: 11.5px; color: var(--muted); display: grid; justify-items: center; gap: 5px; }
+.sw i { width: 42px; height: 42px; border-radius: 14px; display: block; position: relative; transition: transform .2s; box-shadow: inset 0 1px 0 rgba(255,255,255,.6); }
+.sw.on i { outline: 3px solid var(--text); outline-offset: 2px; } .sw:hover i { transform: scale(1.06); }
+.sw.mochi i::after { content: "🐣"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 18px; }
+.trow { display: flex; align-items: center; gap: 12px; padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--line); }
+.trow div { flex: 1; font-weight: 600; } .trow small { display: block; color: var(--muted); font-weight: 500; font-size: 12.5px; }
+.gtoggle { width: 50px; height: 30px; border-radius: 99px; background: var(--line); position: relative; cursor: pointer; border: 0; padding: 0; flex: none; transition: background .25s; }
+.gtoggle::after { content: ""; position: absolute; left: 3px; top: 3px; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(180deg, #fff, #eef);
+  box-shadow: inset 0 1px 0 #fff, 0 3px 8px rgba(0,0,0,.25); transition: transform .3s cubic-bezier(.3, 1.5, .6, 1); }
+.gtoggle.on { background: var(--grad); } .gtoggle.on::after { transform: translateX(20px); }
+
+/* ---------- command palette (Ctrl+K) ---------- */
+.cmd-bg { position: fixed; inset: 0; z-index: 70; background: rgba(10,8,20,.32); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); display: none; }
+.cmd-bg.open { display: block; }
+.cmd { max-width: 520px; margin: 12vh auto 0; border-radius: 22px; overflow: hidden; animation: popIn .2s; }
+.cmd input { width: 100%; border: 0; border-bottom: 1px solid var(--line); padding: 16px 18px; font-size: 16px; font-family: inherit; background: transparent; color: var(--text); outline: none; }
+.cmd ul { list-style: none; margin: 0; padding: 8px; max-height: 340px; overflow: auto; }
+.cmd li { padding: 10px 12px; border-radius: 12px; display: flex; gap: 10px; align-items: center; cursor: pointer; color: var(--text); }
+.cmd li.sel { background: var(--a-soft); } .cmd li small { margin-left: auto; color: var(--muted); }
+
+/* ---------- bottom dock on phones (the menu, app style) ---------- */
+.dock { display: none; }
+@media (max-width: 860px) {
+  /* a narrow floating pill, centred (not edge to edge) */
+  .dock { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; left: 50%; transform: translateX(-50%);
+    width: min(330px, calc(100% - 40px)); bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 50; border-radius: 28px; padding: 5px; overflow: hidden; }
+  .dock a { position: relative; z-index: 1; display: grid; justify-items: center; gap: 0; padding: 5px 0; border-radius: 22px; text-decoration: none; color: var(--muted); font-weight: 600; font-size: 10.5px; }
+  .dock a span { font-size: 18px; }
+  .dock a.active { color: var(--a-ink); }
+  .dock .drop { position: absolute; z-index: 0; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 4); border-radius: 22px;
+    background: linear-gradient(180deg, color-mix(in srgb, #fff 55%, transparent), color-mix(in srgb, #fff 18%, transparent)), var(--a-soft);
+    box-shadow: inset 0 1px 0 #fff, inset 0 -2px 6px color-mix(in srgb, var(--accent) 25%, transparent), 0 4px 14px color-mix(in srgb, var(--accent) 25%, transparent);
+    transition: transform .45s cubic-bezier(.3, 1.6, .5, 1); }
+  :root[data-theme="dark"] .dock .drop { background: linear-gradient(180deg, color-mix(in srgb, #fff 18%, transparent), color-mix(in srgb, #fff 4%, transparent)), var(--a-soft);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent), 0 4px 14px rgba(0,0,0,.4); }
+}
+
+/* ---------- controls: buttons squish like a drop, accent everywhere ---------- */
+button, .btn { transition: transform .35s cubic-bezier(.3, 1.6, .5, 1), box-shadow .2s; }
+button:active:not(:disabled), .btn:active { transform: scale(.94, .9); }
+button.primary, .primary, .btn.primary { background: var(--grad) !important; color: #fff !important; border: 0 !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent), 0 8px 22px color-mix(in srgb, var(--accent) 35%, transparent); }
+.switch input:checked + span { background: var(--grad); }
+.pet-bar { background: var(--a-soft); }
+.pet-bar i { background: var(--grad) !important; }
+.seg button.on, .seg .on { background: var(--surface-solid); }
+input[type="range"] { accent-color: var(--accent); }
+.toast { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }

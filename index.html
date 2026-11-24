@@ -14,7 +14,8 @@
 <meta name="apple-mobile-web-app-title" content="Mochi AI Lab">
 <script>
   // links to sections of the old one-page flasher now live on the ESP32-C3 page
-  if (['#nap', '#daydien', '#luuy'].includes(location.hash)) location.replace('esp32-c3.html' + location.hash);
+  if (['#daydien', '#luuy'].includes(location.hash)) location.replace('esp32-c3.html' + location.hash);
+  else if (location.hash === '#nap') location.replace('cai-dat.html#nap');
   // the QR code on Mochi's screen (menu > Code web): https://mochiailab.github.io/#<key>
   // (after '#', so the key never reaches the server); Cài đặt fills it in and connects
   else if (/^#[A-Za-z0-9]{12}$/.test(location.hash)) location.replace('cai-dat.html' + location.hash);
@@ -22,40 +23,72 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261133">
-<style>
-.hero { align-items: center; }
-.hero p { max-width: 640px; font-size: 16px; }
-</style>
+<script src="theme.js?v=20261140"></script>
+<link rel="stylesheet" href="site.css?v=20261140">
+<link rel="stylesheet" href="glass.css?v=20261141">
+<link rel="stylesheet" href="home.css?v=20261140">
 </head>
 <body>
 <header data-active="home"></header>
 
-<div class="wrap">
-  <div class="hero">
+<main class="home">
+  <section class="hero">
     <div>
-      <h1>Mochi <b>AI Lab</b></h1>
-      <p>Thú cưng để bàn biết nói chuyện, chạy trên ESP32. Dùng các tính năng của Mochi ngay trên điện thoại, hoặc chọn mạch để nạp firmware và xem sơ đồ đấu dây.</p>
+      <span class="greet" id="greet">👋 Xin chào</span>
+      <h1>Bạn nhỏ <em>Mochi</em> trên bàn làm việc</h1>
+      <p class="lead">Nuôi Mochi, nhắn chữ, đổi màu, xem giờ và thời tiết, cập nhật qua Wi-Fi. Tất cả từ điện thoại, mã hoá đầu-cuối.</p>
+      <div class="btns">
+        <a class="btn primary" href="giao-dien.html">🐣 Điều khiển Mochi</a>
+        <a class="btn" href="cai-dat.html#nap">⚡ Nạp firmware <small>(trong Cài đặt)</small></a>
+      </div>
+    </div>
+    <div class="screen"><canvas id="live" aria-label="Màn hình Mochi trực tiếp"></canvas><span class="live-tag" id="liveTag">Mô phỏng</span></div>
+  </section>
+
+  <div class="label" id="who">Mochi của bạn</div>
+  <div class="dash" id="dashboard">
+    <div class="card">
+      <h2>🐣 Tâm trạng</h2>
+      <div class="mood"><span class="e" id="moodE">🙂</span><div><b id="moodT">Đang kết nối…</b><small id="moodS"></small></div></div>
+      <div class="stat" id="sF"><span>🍙</span><div class="bar"><i></i></div><b>–</b></div>
+      <div class="stat" id="sJ"><span>💗</span><div class="bar"><i></i></div><b>–</b></div>
+      <div class="stat" id="sT"><span>💬</span><div class="bar"><i></i></div><b>–</b></div>
+      <div class="stat" id="sE"><span>😴</span><div class="bar"><i></i></div><b>–</b></div>
+    </div>
+    <div class="card">
+      <h2>⚡ Làm nhanh</h2>
+      <div class="quick">
+        <button class="q" data-cmd="feed" data-v="0" data-t="Mochi đang ăn bánh 😋"><span>🍡</span>Cho ăn</button>
+        <button class="q" data-cmd="pet" data-t="Đã thả tim 💗"><span>💗</span>Thả tim</button>
+        <button class="q" data-cmd="clock_show" data-t="Mochi hiện giờ 8 giây ⏰"><span>⏰</span>Xem giờ</button>
+        <button class="q" data-cmd="sleep" data-t="Mochi đi ngủ 😴"><span>😴</span>Ngủ ngay</button>
+        <button class="q" data-href="nhan-chu.html"><span>✉️</span>Nhắn chữ</button>
+        <button class="q" data-t="Nói với Mochi: &quot;Mochi ơi, mở bài …&quot; 🎵"><span>🎵</span>Mở nhạc</button>
+        <button class="q" data-cmd="timer" data-v="1500" data-t="Hẹn giờ 25 phút 🍅"><span>🍅</span>25 phút</button>
+        <button class="q" data-href="cai-dat.html"><span>⬆️</span>Cập nhật</button>
+      </div>
+      <div class="qrow"><div>Gọi để trò chuyện<small>Gọi to "Mochi ơi!" là Mochi nghe luôn</small></div><button class="gtoggle" id="qCall" aria-label="Gọi để trò chuyện"></button></div>
+      <div class="qrow"><div>Tiếng khi chạm<small>"pi-pu-pi" và "kyu-kyu-kyu"</small></div><button class="gtoggle" id="qTsnd" aria-label="Tiếng khi chạm"></button></div>
     </div>
   </div>
+  <div class="card nokey" id="nokey" hidden>
+    <h2 style="justify-content:center">🔑 Kết nối Mochi của bạn</h2>
+    <p class="lead" style="margin:0 auto 14px">Trên Mochi: giữ nút chạm 2 giây, chạm tới mục <b>Code web</b> rồi quét mã QR bằng camera điện thoại. Hoặc nhập mã 12 ký tự ở trang Cài đặt.</p>
+    <a class="btn primary" href="cai-dat.html">Nhập mã ở Cài đặt</a>
+  </div>
 
-  <!-- the cards come from cards.js (add boards / features there) -->
-
-
-  <section id="tinh-nang">
-    <h2>Tính năng</h2>
-    <p>Dùng trên điện thoại hoặc máy tính, cho Mochi đã nạp firmware mới.</p>
-    <div class="cards" data-cards="features"></div>
-  </section>
-
-  <section id="nap-firmware">
-    <h2>Nạp firmware</h2>
-    <p>Mỗi mạch có trang riêng: nút nạp ngay trên trình duyệt, sơ đồ đấu dây bằng ảnh linh kiện thật và bảng chân.</p>
-    <div class="cards" data-cards="boards"></div>
-  </section>
-</div>
+  <div class="label">Tính năng</div>
+  <div class="feats">
+    <a class="card feat" href="giao-dien.html"><span class="ic">🎨</span><div><b>Giao diện & nuôi Mochi</b><small>Cho ăn, màu thân, đồng hồ, thời tiết, giờ ngủ, các công tắc.</small></div></a>
+    <a class="card feat" href="nhan-chu.html"><span class="ic">✉️</span><div><b>Nhắn chữ lên Mochi</b><small>Chữ chạy dưới mặt Mochi hoặc chữ to trên nền màu.</small></div></a>
+    <a class="card feat" href="cai-dat.html"><span class="ic">⚙️</span><div><b>Cài đặt & nạp firmware</b><small>Âm lượng, hẹn giờ, Wi-Fi, cập nhật, đổi mã, nạp firmware cho Mochi mới.</small></div></a>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
 <footer></footer>
-<script src="site.js?v=20261128"></script>
-<script src="cards.js?v=20261139"></script>
+<script src="site.js?v=20261140"></script>
+<script src="mochi-link.js?v=20261140"></script>
+<script src="mochi-screen.js?v=20261140"></script>
+<script src="home.js?v=20261140"></script>
 </body>
 </html>

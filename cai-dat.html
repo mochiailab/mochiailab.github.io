@@ -14,8 +14,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20261133">
-<link rel="stylesheet" href="mochi-panel.css?v=20261138">
+<script src="theme.js?v=20261140"></script>
+<link rel="stylesheet" href="site.css?v=20261140">
+<link rel="stylesheet" href="glass.css?v=20261141">
+<link rel="stylesheet" href="mochi-panel.css?v=20261140">
 </head>
 <body>
 <header data-active="settings"></header>
@@ -99,13 +101,20 @@
   </div>
 
 
+  <div class="card" id="nap">
+    <h2><span>⚡</span>Nạp firmware</h2>
+    <p class="note" style="margin:0 0 12px">Cho Mochi mới hoặc khi cập nhật qua Wi-Fi không được: chọn mạch của Mochi. Mỗi mạch có nút nạp ngay trên trình duyệt (Chrome hoặc Edge trên máy tính, cắm Mochi bằng cáp USB-C), sơ đồ đấu dây bằng ảnh linh kiện thật và bảng chân. Nạp lại sẽ xoá Wi-Fi, cài đặt và mã.</p>
+    <div class="cards" data-cards="boards"></div>
+  </div>
+
   <p class="note">🔒 Lệnh và trạng thái được <b>mã hoá đầu-cuối</b> bằng mã của Mochi trước khi đi qua máy chủ nhắn tin công cộng (broker.emqx.io): máy chủ và người lạ chỉ thấy dữ liệu đã khoá, không đọc hay giả được lệnh. Mã chỉ hiện trên màn Mochi và lưu trong trình duyệt này, không bao giờ được gửi lên mạng. Ai biết mã thì điều khiển được Mochi, nên đừng chia sẻ mã.</p>
 </main>
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261128"></script>
-<script src="mochi-link.js?v=20261133"></script>
-<script src="mochi-panel.js?v=20261139"></script>
+<script src="site.js?v=20261140"></script>
+<script src="mochi-link.js?v=20261140"></script>
+<script src="mochi-panel.js?v=20261140"></script>
+<script src="cards.js?v=20261140"></script>
 </body>
 </html>
