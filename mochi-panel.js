@@ -76,6 +76,8 @@ function render() {
   document.querySelectorAll('#colors button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.color));
   $('clock').checked = state.clock === 1;
   $('volume').value = state.volume; $('volVal').textContent = state.volume + '%';
+  if (typeof state.bright === 'number') { $('bright').value = state.bright; $('brightVal').textContent = state.bright + '%'; }
+  else $('brightVal').textContent = 'cần bản mới';  // firmware before the brightness setting
   const bedOn = state.bed_s !== state.bed_e;
   $('bedOn').checked = bedOn; $('bedHours').hidden = !bedOn;
   if (bedOn) { $('bedS').value = state.bed_s; $('bedE').value = state.bed_e; }
@@ -182,6 +184,8 @@ $('timerSet').addEventListener('click', () => {
 $('timerCancel').addEventListener('click', () => { if (send('timer', { v: 0 })) toast('Đã huỷ hẹn giờ'); });
 $('volume').addEventListener('input', () => { $('volVal').textContent = $('volume').value + '%'; });
 $('volume').addEventListener('change', () => { if (send('volume', { v: +$('volume').value })) toast('Âm lượng ' + $('volume').value + '%'); });
+$('bright').addEventListener('input', () => { $('brightVal').textContent = $('bright').value + '%'; });
+$('bright').addEventListener('change', () => { if (send('bright', { v: +$('bright').value })) toast('Độ sáng ' + $('bright').value + '%'); });
 for (const id of ['bedS', 'bedE']) {
   $(id).innerHTML = Array.from({ length: 24 }, (_, h) => `<option value="${h}">${String(h).padStart(2, '0')}:00</option>`).join('');
 }
