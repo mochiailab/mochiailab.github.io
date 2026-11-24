@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084 https://geocoding-api.open-meteo.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tính năng Mochi · Mochi AI Lab</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#fbf6f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17132a">
+<meta name="apple-mobile-web-app-title" content="Mochi AI Lab">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="theme.js?v=20261140"></script>
+<link rel="stylesheet" href="site.css?v=20261140">
+<link rel="stylesheet" href="glass.css?v=20261141">
+<link rel="stylesheet" href="mochi-panel.css?v=20261151">
+<link rel="stylesheet" href="nhan-chu.css?v=20261150">
+</head>
+<body>
+<header data-active="features"></header>
+
+<main>
+  <h1>Tính năng <b>Mochi</b></h1>
+  <p class="lead">Nhắn chữ, nuôi Mochi, lời nhắc và báo thức, Pomodoro, hẹn giờ, gọi để trò chuyện. Mọi thay đổi được Mochi lưu lại.</p>
+
+  <div class="card linkcard">
+    <div class="status" id="status"><i></i><div class="grow"><b id="stTitle">Đang kết nối…</b><small id="stSub">Dùng mã của Mochi đã lưu ở trang Cài đặt</small></div><a class="keylink" href="cai-dat.html#ma">🔑 Mã</a></div>
+  </div>
+
+  <nav class="jump" aria-label="Các tính năng">
+    <a href="#chu">✉️ Nhắn chữ</a><a href="#petCard">🐣 Nuôi Mochi</a><a href="#alarmCard">⏰ Lời nhắc</a><a href="#pomoCard">🍅 Pomodoro</a><a href="#hen-gio">⏳ Hẹn giờ</a><a href="#noi">🗣 Trò chuyện</a>
+  </nav>
+
+  <fieldset id="controls" disabled>
+  <div class="card" id="chu">
+    <h2><span>✉️</span>Nhắn chữ</h2>
+    <p class="note sub">Gõ một câu, chữ chạy trên màn Mochi: dưới mặt Mochi, hoặc chữ to trên nền màu bạn chọn.</p>
+    <div class="tabs" role="tablist" aria-label="Giao diện">
+      <button class="on" data-mode="mochi" role="tab">Mochi + chữ</button>
+      <button data-mode="color" role="tab">Màu nền + chữ to</button>
+    </div>
+    <div class="screen" id="screen" aria-hidden="true">
+      <div class="blob"></div><div class="eye l"></div><div class="eye r"></div>
+      <div class="bar"><span id="preview" class="short">xin chào!</span></div>
+      <div class="poster" id="poster"><span id="posterText">xin chào!</span></div>
+    </div>
+    <div class="opts hidden" id="colorOpts">
+    <div class="opt">
+      <label class="lbl">Màu nền</label>
+      <div class="colors">
+        <input type="color" id="bg" value="#f7b6cb" aria-label="Màu nền">
+        <label class="check"><input type="checkbox" id="grad"> Chuyển màu</label>
+        <input type="color" id="bg2" value="#8a5cf0" aria-label="Màu thứ hai" class="hidden">
+        <span class="seg hidden" id="dirSeg"><button data-dir="h" class="on">Ngang</button><button data-dir="v">Dọc</button></span>
+      </div>
+      <div class="colors" style="margin-top:10px" id="presets" aria-label="Mẫu màu">
+        <button class="sw" title="Hồng" data-p="#f7b6cb,,#ffffff" style="background:#f7b6cb"></button>
+        <button class="sw" title="Hoàng hôn" data-p="#ff7a59,#c53cbe,#ffffff" style="background:linear-gradient(90deg,#ff7a59,#c53cbe)"></button>
+        <button class="sw" title="Biển" data-p="#00b4d8,#3a0ca3,#ffffff" style="background:linear-gradient(90deg,#00b4d8,#3a0ca3)"></button>
+        <button class="sw" title="Bạc hà" data-p="#b9f3d8,#5ec6a0,#173b2f" style="background:linear-gradient(90deg,#b9f3d8,#5ec6a0)"></button>
+        <button class="sw" title="Vàng" data-p="#ffd84d,,#3a2a00" style="background:#ffd84d"></button>
+        <button class="sw" title="Đêm" data-p="#0b1026,#2b2d6e,#ffe27a" style="background:linear-gradient(90deg,#0b1026,#2b2d6e)"></button>
+        <button class="sw" title="Đỏ" data-p="#d7263d,,#ffffff" style="background:#d7263d"></button>
+        <button class="sw" title="Đen" data-p="#000000,,#ffffff" style="background:#000"></button>
+      </div>
+    </div>
+    <div class="opt">
+      <label class="lbl">Màu chữ</label>
+      <div class="colors"><input type="color" id="fg" value="#ffffff" aria-label="Màu chữ"></div>
+    </div>
+    <div class="opt">
+      <label class="lbl">Cỡ chữ</label>
+      <span class="seg" id="sizeSeg"><button data-sz="20">Nhỏ</button><button data-sz="32">Vừa</button><button data-sz="48" class="on">To</button></span>
+    </div>
+    <div class="opt">
+      <label class="lbl" for="speed">Tốc độ chạy: <span id="speedVal">40</span></label>
+      <input type="range" id="speed" min="10" max="150" step="5" value="40">
+    </div>
+    </div>
+    <label class="lbl msgLbl" for="msg">Nội dung</label>
+    <textarea id="msg" placeholder="Ví dụ: Chúc cả nhà buổi tối vui vẻ!" maxlength="300"></textarea>
+    <div class="meta"><span>Tối đa khoảng 100 chữ có dấu</span><span id="count">0 / 300</span></div>
+    <div class="row">
+      <select id="secs" aria-label="Thời gian hiện">
+        <option value="15">Hiện 15 giây</option>
+        <option value="30" selected>Hiện 30 giây</option>
+        <option value="60">Hiện 1 phút</option>
+        <option value="180">Hiện 3 phút</option>
+        <option value="600">Hiện 10 phút</option>
+        <option value="3600">Hiện 1 giờ</option>
+        <option value="-1">Giữ đến khi xoá</option>
+      </select>
+      <button class="primary grow" id="btnSend" disabled>Gửi lên Mochi</button>
+    </div>
+    <button class="danger stop" id="btnClear" disabled>⏹ Tắt chạy chữ</button>
+    <p class="chiplabel">Ký hiệu Mochi hiện được (bấm để chèn)</p>
+    <!-- exactly the symbols in the mochi_vi fonts (tools/fontgen/render.html) -->
+    <div class="chips syms" id="syms">
+      <button>♥</button><button>★</button><button>☆</button><button>☀</button><button>☁</button><button>☂</button>
+      <button>♪</button><button>♫</button><button>☺</button><button>✓</button><button>→</button><button>←</button>
+      <button>•</button><button>…</button><button>°</button>
+    </div>
+    <p class="note symnote" id="symNote">Ký hiệu chỉ hiện ở giao diện <b>Màu nền + chữ to</b>. Ở giao diện Mochi + chữ, Mochi bỏ trống ký hiệu.</p>
+    <p class="chiplabel">Câu mẫu</p>
+    <div class="chips" id="quick">
+      <button>Chúc ngủ ngon ★</button>
+      <button>Chào buổi sáng ☀</button>
+      <button>Đi ăn cơm thôi ♪</button>
+      <button>Nhớ uống nước nha ☺</button>
+      <button>Yêu cả nhà ♥</button>
+      <button>Trời mưa nhớ mang ô ☂</button>
+      <button>Xong việc rồi ✓</button>
+      <button>Hôm nay 30°</button>
+    </div>
+  </div>
+
+  <div class="card" id="petCard">
+    <h2><span>🐣</span>Nuôi Mochi</h2>
+    <div class="pet-mood"><span id="petFace">🙂</span><div><b id="petMood">–</b><small id="petAte"></small></div></div>
+    <div class="pet-stat"><span>🍙 No bụng</span><div class="pet-bar"><i id="petF" style="background:#ff9a5a"></i></div><span id="petFv">–</span></div>
+    <div class="pet-stat"><span>💗 Vui vẻ</span><div class="pet-bar"><i id="petJ" style="background:#ff7fb0"></i></div><span id="petJv">–</span></div>
+    <div class="pet-stat"><span>💬 Tâm sự</span><div class="pet-bar"><i id="petT" style="background:#7fb8ff"></i></div><span id="petTv">–</span></div>
+    <div class="pet-stat"><span>😴 Năng lượng</span><div class="pet-bar"><i id="petE" style="background:#5ed3b4"></i></div><span id="petEv">–</span></div>
+    <div class="row" id="foods"><button class="grow" data-food="0">🍡 Bánh mochi</button><button class="grow" data-food="1">🍓 Trái cây</button><button class="grow" data-food="2">🥛 Sữa</button></div>
+    <div class="row"><button class="grow" data-cmd="pet">💗 Thả tim cho Mochi</button></div>
+    <p class="note" style="margin:8px 0 0">Mochi đói sau khoảng 6 tiếng. Vuốt ve làm Mochi vui, trò chuyện để Mochi đỡ cô đơn, ngủ để lấy lại sức. Khi Mochi cần tâm sự, chạm 2 lần là Mochi mở lời.</p>
+    <div class="row" style="margin-top:14px"><span class="lbl grow">Nuôi Mochi<br><span class="muted" style="font-weight:400">Đói, vui, buồn, cần tâm sự, mệt</span></span><label class="switch"><input type="checkbox" id="petOn" aria-label="Nuôi Mochi"><span></span></label></div>
+    <div class="row"><span class="lbl grow">Kêu khi đói / buồn<br><span class="muted" style="font-weight:400">Tối đa 2 lần mỗi giờ, không kêu ban đêm</span></span><label class="switch"><input type="checkbox" id="petSnd" aria-label="Kêu khi đói hoặc buồn"><span></span></label></div>
+  </div>
+
+  <div class="card" id="alarmCard">
+    <h2><span>⏰</span>Lời nhắc & báo thức</h2>
+    <div id="alarmList" class="alarm-list"><p class="muted" style="margin:0">Chưa có lời nhắc nào.</p></div>
+    <div class="alarm-form">
+      <div class="seg alarm-kind" id="aKind"><button data-k="1" class="on">Hằng ngày</button><button data-k="0">Một lần</button><button data-k="2">Lặp lại</button><button data-k="3">Báo thức</button></div>
+      <div class="row" id="aTimeRow"><span class="lbl">Lúc</span><input type="time" id="aTime" value="07:00" aria-label="Giờ"></div>
+      <div class="row" id="aEveryRow" hidden><span class="lbl">Mỗi</span><select id="aEvery" aria-label="Lặp lại mỗi"><option value="30">30 phút</option><option value="60">1 tiếng</option><option value="120" selected>2 tiếng</option><option value="180">3 tiếng</option></select><span class="muted">từ 7:00 đến 22:00</span></div>
+      <div class="row" id="aDaysRow"><span class="lbl">Ngày</span><span class="days" id="aDays"><button data-b="2" class="on">T2</button><button data-b="4" class="on">T3</button><button data-b="8" class="on">T4</button><button data-b="16" class="on">T5</button><button data-b="32" class="on">T6</button><button data-b="64" class="on">T7</button><button data-b="1" class="on">CN</button></span></div>
+      <div class="row"><input id="aText" class="grow" maxlength="40" placeholder="Nhắc gì? Ví dụ: Uống nước 💧" autocomplete="off"></div>
+      <div class="row"><button class="primary grow" id="aAdd">＋ Thêm lời nhắc</button></div>
+      <p class="note" style="margin:6px 0 0">Tới giờ Mochi hiện chữ to trên nền màu và kêu, chạm vào Mochi để tắt. Báo thức đánh thức Mochi, chào buổi sáng kèm nhiệt độ và nhắc mang ô khi trời mưa. Nói với Mochi cũng được: "nhắc mình 10 phút nữa uống thuốc", "đặt báo thức 6 giờ 30". Tối đa 8 lời nhắc.</p>
+    </div>
+  </div>
+
+  <div class="card" id="pomoCard">
+    <h2><span>🍅</span>Pomodoro</h2>
+    <div class="row"><span class="grow" id="pomoInfo">25 phút tập trung, 5 phút nghỉ; sau 4 lần nghỉ dài 15 phút. Viền trên màn Mochi chạy theo thời gian.</span></div>
+    <div class="row"><button class="primary grow" id="pomoStart">🍅 Bắt đầu</button><button class="grow" id="pomoStop">⏹ Dừng</button></div>
+  </div>
+
+  <div class="card" id="hen-gio">
+    <h2><span>⏳</span>Hẹn giờ</h2>
+    <div class="row">
+      <span class="lbl">Đang hẹn</span>
+      <span class="muted grow" id="timerLeft">Không có hẹn giờ</span>
+    </div>
+    <div class="row" id="timerQuick">
+      <button data-min="1">1 phút</button><button data-min="5">5 phút</button><button data-min="10">10 phút</button><button data-min="25">25 phút</button>
+    </div>
+    <div class="row">
+      <input type="number" id="timerMin" min="1" max="600" value="15" aria-label="Số phút"> <span class="muted">phút</span>
+      <button class="primary" id="timerSet">Đặt</button>
+      <button class="danger" id="timerCancel">Huỷ hẹn giờ</button>
+    </div>
+  </div>
+
+  <div class="card" id="noi">
+    <h2><span>🗣</span>Trò chuyện & âm thanh</h2>
+    <div class="row"><span class="lbl grow">Gọi để trò chuyện<br><span class="muted" style="font-weight:400">Gọi to "Mochi ơi!" là Mochi nghe luôn, không cần "Hi ESP"</span></span><label class="switch"><input type="checkbox" id="callOn" aria-label="Gọi để trò chuyện"><span></span></label></div>
+    <div class="row" id="callLevelRow"><span class="lbl grow">Độ nhạy khi gọi</span><span class="seg" id="callLevel"><button data-v="3000">Ít</button><button data-v="1500">Vừa</button><button data-v="800">Nhạy</button></span></div>
+    <p class="note" id="callNote" style="margin:0 0 6px">Mochi nghe một tiếng gọi dài khoảng nửa giây đến một giây rưỡi. Vỗ tay, tiếng sập cửa quá ngắn, tivi hay nhạc kêu liên tục thì Mochi bỏ qua. Nếu Mochi hay tự nghe nhầm, chọn "Ít"; gọi mãi không nghe, chọn "Nhạy".</p>
+    <div class="row"><span class="lbl grow">Tiếng khi chạm<br><span class="muted" style="font-weight:400">"pi-pu-pi" và "kyu-kyu-kyu"</span></span><label class="switch"><input type="checkbox" id="tsnd" aria-label="Tiếng khi chạm"><span></span></label></div>
+    <div class="row"><span class="lbl grow">🎵 Nghe nhạc<br><span class="muted" style="font-weight:400">Nói "Mochi ơi, mở bài Hà Nội mùa thu". Cần máy chủ nhạc chạy trong mạng nhà (mochi_music). Chạm vào Mochi để tắt nhạc.</span></span></div>
+  </div>
+
+  </fieldset>
+
+  <p class="note">🔒 Lệnh và trạng thái được <b>mã hoá đầu-cuối</b> bằng mã của Mochi trước khi đi qua máy chủ nhắn tin công cộng (broker.emqx.io): máy chủ và người lạ chỉ thấy dữ liệu đã khoá, không đọc hay giả được lệnh. Mã chỉ hiện trên màn Mochi và lưu trong trình duyệt này, không bao giờ được gửi lên mạng. Ai biết mã thì điều khiển được Mochi, nên đừng chia sẻ mã.</p>
+</main>
+<footer></footer>
+<div class="toast" id="toast"></div>
+
+<script src="site.js?v=20261150"></script>
+<script src="mochi-link.js?v=20261141"></script>
+<script src="mochi-panel.js?v=20261151"></script>
+<script src="nhan-chu.js?v=20261150"></script>
+</body>
+</html>

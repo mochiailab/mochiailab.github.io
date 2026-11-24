@@ -1,5 +1,6 @@
-// Mochi AI Lab: connection + controls of the remote-control pages (giao-dien.html, cai-dat.html).
-// Each page holds only the cards it shows; this wires whatever is there.
+// Mochi AI Lab: connection + controls of the remote-control pages (giao-dien.html, tinh-nang.html,
+// cai-dat.html). Each page holds only the cards it shows; this wires whatever is there.
+// Other scripts on the page (nhan-chu.js) share this one link through window.MochiPanel.
 // Commands / state must match OnRemoteCommand / StateJson in the firmware (mochi_c3_board.cc).
 (function () {
 const { Link, OldLink, KEY_RE, OLD_CODE_RE, normKey, prettyKey } = window.MochiLink;
@@ -12,6 +13,11 @@ const COLORS = window.MochiLink.BODY_COLORS.map((c) => [c.name, c.dark ? '#11111
 const DUMMY = document.createElement('div');
 const $ = (id) => document.getElementById(id) || DUMMY;
 let mq = null, code = '', online = null, state = null, gotState = false;
+// the key box lives on Cài đặt only; the other pages connect with the key saved there
+const KEY_BOX = !!document.getElementById('code');
+const listeners = [];  // (leaf, payload): every message, plus ('link', status) on connection changes
+function emit(leaf, payload) { for (const f of listeners) { try { f(leaf, payload); } catch (e) { console.error(e); } } }
+window.MochiPanel = { on: (f) => listeners.push(f), link: () => mq };
 
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
@@ -134,7 +140,7 @@ const DONE = { weather_refresh: 'Mochi đang lấy thời tiết…', text_off: 
 function connectOld(c) {
   if (mq) mq.close();
   code = c; online = null; state = null; gotState = false;
-  window.MochiLink.saveCode(c);
+  if (KEY_BOX) window.MochiLink.saveCode(c);
   $('controls').disabled = true;
   const box = document.getElementById('oldFw');
   if (box) box.hidden = false;
@@ -169,22 +175,25 @@ $('oldFwBtn').addEventListener('click', () => {
   toast('Đã gửi lệnh cập nhật');
 });
 
-function connect() {
-  const c = normKey($('code').value);
+function connect(key) {
+  const c = normKey(key || $('code').value);
   if (OLD_CODE_RE.test(c)) { connectOld(c); return; }
   const box = document.getElementById('oldFw');
   if (box) box.hidden = true;
   if (!KEY_RE.test(c)) { toast('Mã gồm 12 chữ/số, xem trong menu của Mochi (mục Code web)'); $('code').focus(); return; }
   if (mq) mq.close();
   code = c; online = null; state = null; gotState = false;
-  window.MochiLink.saveCode(code);
+  if (KEY_BOX) window.MochiLink.saveCode(code);
   setStatus('busy', 'Đang kết nối…', 'Tới máy chủ nhắn tin');
   mq = new Link(code, (leaf, payload) => {
     if (leaf === 'status') online = payload === 'online';
     else if (leaf === 'state') {
-      try { state = JSON.parse(payload); gotState = true; render(); } catch (e) {}
+      try { state = JSON.parse(payload); gotState = true; render(); renderPomo(); } catch (e) {}
+    } else if (leaf === 'alarms') {
+      try { alarms = JSON.parse(payload) || []; renderAlarms(); } catch (e) {}
     }
     refreshStatus();
+    emit(leaf, payload);
   }, (st) => {
     if (st === 'ready') {
       setTimeout(refreshStatus, 2500);
@@ -192,9 +201,75 @@ function connect() {
     else if (st === 'closed') setStatus('', 'Mất kết nối', 'Bấm Kết nối để thử lại');
     else setStatus('', 'Máy chủ từ chối kết nối', 'Thử lại sau ít phút');
     refreshStatus();
+    emit('link', st);
   });
   mq.open();
 }
+
+
+// ---------- reminders & alarms (firmware: mochi_alarms.h; list on the sealed "alarms" topic) ----------
+const KIND_NAME = ['Một lần', 'Hằng ngày', 'Lặp lại', 'Báo thức'];
+const DAY_NAME = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+let alarms = [], aKind = 1;
+const pad2 = (n) => String(n).padStart(2, '0');
+function daysText(d) {
+  if (d === 127) return 'mỗi ngày';
+  if (d === 62) return 'thứ 2 - thứ 6';
+  if (d === 65) return 'cuối tuần';
+  return [1, 2, 3, 4, 5, 6, 0].filter((i) => d & (1 << i)).map((i) => DAY_NAME[i]).join(', ');
+}
+function renderAlarms() {
+  const el = $('alarmList');
+  if (!alarms.length) { el.innerHTML = '<p class="muted" style="margin:0">Chưa có lời nhắc nào.</p>'; return; }
+  el.innerHTML = alarms.map((a, i) => {
+    const when = a.k === 2 ? (a.n >= 60 ? (a.n / 60) + ' tiếng' : a.n + ' phút') : pad2(a.h) + ':' + pad2(a.m);
+    const sub = a.k === 2 ? 'Lặp lại mỗi ' + when + ', 7:00–22:00' : a.k === 0 ? 'Một lần' : (a.k === 3 ? '☀ Báo thức, ' : '') + daysText(a.d);
+    const what = a.t ? a.t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : (a.k === 3 ? 'Chào buổi sáng' : 'Đến giờ rồi');
+    return `<div class="alarm${a.on ? '' : ' off'}"><span class="when">${a.k === 2 ? '🔁' : when}</span>` +
+      `<div class="what"><b>${what}</b><small>${sub}</small></div>` +
+      `<label class="switch"><input type="checkbox" data-on="${i}" ${a.on ? 'checked' : ''} aria-label="Bật"><span></span></label>` +
+      `<button class="del" data-del="${i}" aria-label="Xoá">✕</button></div>`;
+  }).join('');
+}
+function syncForm() {
+  document.querySelectorAll('#aKind button').forEach((b) => b.classList.toggle('on', +b.dataset.k === aKind));
+  $('aTimeRow').hidden = aKind === 2;
+  $('aEveryRow').hidden = aKind !== 2;
+  $('aDaysRow').hidden = aKind === 0 || aKind === 2;
+  $('aText').placeholder = aKind === 3 ? 'Lời chào (để trống: "Chào buổi sáng!")' : 'Nhắc gì? Ví dụ: Uống nước 💧';
+}
+$('aKind').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; aKind = +b.dataset.k; syncForm(); });
+$('aDays').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) b.classList.toggle('on'); });
+$('aAdd').addEventListener('click', () => {
+  if (alarms.length >= 8) { toast('Tối đa 8 lời nhắc: xoá bớt một cái nhé'); return; }
+  const [h, m] = ($('aTime').value || '07:00').split(':').map(Number);
+  let d = 0; document.querySelectorAll('#aDays button.on').forEach((b) => { d |= +b.dataset.b; });
+  if ((aKind === 1 || aKind === 3) && !d) { toast('Chọn ít nhất một ngày'); return; }
+  const t = $('aText').value.trim();
+  if (aKind !== 3 && !t) { toast('Gõ nội dung lời nhắc'); $('aText').focus(); return; }
+  const item = { i: -1, k: aKind, h, m, d: d || 127, n: +$('aEvery').value, on: 1, t };
+  if (send('alarm_set', item)) { toast('Đã thêm: ' + (t || 'báo thức') + ' ✓'); $('aText').value = ''; }
+});
+$('alarmList').addEventListener('click', (e) => {
+  const del = e.target.closest('[data-del]');
+  if (del && confirm('Xoá lời nhắc này?')) send('alarm_del', { v: +del.dataset.del });
+});
+$('alarmList').addEventListener('change', (e) => {
+  const sw = e.target.closest('[data-on]'); if (!sw) return;
+  const i = +sw.dataset.on, a = Object.assign({}, alarms[i], { i, on: sw.checked ? 1 : 0 });
+  send('alarm_set', a);
+});
+syncForm();
+
+// ---------- Pomodoro ----------
+function renderPomo() {
+  const on = !!(state && state.pomo);
+  $('pomoCard').classList.toggle('on', on);
+  if (on) $('pomoInfo').textContent = (state.pomo === 1 ? '🍅 Đang tập trung, lần ' : '☕ Đang nghỉ, sau lần ') + (state.pr || 1) + '/4';
+  $('pomoStart').textContent = on ? '↻ Bắt đầu lại' : '🍅 Bắt đầu';
+}
+$('pomoStart').addEventListener('click', () => { if (send('pomo', { v: 1 })) toast('Pomodoro: tập trung 25 phút 🍅'); });
+$('pomoStop').addEventListener('click', () => { if (send('pomo', { v: 0 })) toast('Đã dừng Pomodoro'); });
 
 // ---------- build + wire the controls ----------
 $('colors').innerHTML = COLORS.map(([n, c], i) => `<button data-v="${i}"><i style="background:${c}"></i>${n}</button>`).join('');
@@ -355,7 +430,7 @@ async function findCity() {
 $('wxFind').addEventListener('click', findCity);
 $('wxCity').addEventListener('keydown', (e) => { if (e.key === 'Enter') findCity(); });
 
-$('btnConnect').addEventListener('click', connect);
+$('btnConnect').addEventListener('click', () => connect());
 $('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
 window.MochiLink.keyInput($('code'));
 // opened from the QR code on Mochi (index.html passes #<key> on): take the key, drop it from the URL
@@ -367,8 +442,9 @@ if (KEY_RE.test(fromQr) && location.hash.length === 13) {
   toast('Đã nhận mã từ Mochi ✓');
 } else {
   const saved = window.MochiLink.savedCode();
-  if (KEY_RE.test(saved)) { $('code').value = prettyKey(saved); connect(); }
-  else if (OLD_CODE_RE.test(saved)) { $('code').value = saved; connect(); }
+  if (KEY_RE.test(saved)) { $('code').value = prettyKey(saved); connect(saved); }
+  else if (OLD_CODE_RE.test(saved)) { $('code').value = saved; connect(saved); }
+  else if (!KEY_BOX) setStatus('off', 'Chưa có mã của Mochi', 'Bấm 🔑 Mã để nhập mã ở trang Cài đặt, hoặc quét mã QR trên màn Mochi');
 }
 
 })();

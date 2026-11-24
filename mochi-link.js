@@ -1,4 +1,4 @@
-// Mochi AI Lab: link to a Mochi over the internet (shared by nhan-chu.html and cai-dat.html).
+// Mochi AI Lab: link to a Mochi over the internet (shared by the home page and the control pages).
 // A tiny MQTT 3.1.1 client over WebSocket to the public broker the firmware uses
 // (mochi_remote.h), and the end-to-end encryption on top: the broker only sees sealed data.
 (function () {
@@ -109,7 +109,7 @@ class Link {
     this.k = await deriveKeys(this.key);
     if (this.closed) return;
     this.mq = new Mqtt(BROKER, 'web-' + Math.random().toString(36).slice(2, 10), (tp, payload) => this.got(tp, payload), (st) => {
-      if (st === 'ready') ['status', 'state', 'ack', 'scene'].forEach((l) => this.mq.subscribe(this.k.base + l));
+      if (st === 'ready') ['status', 'state', 'ack', 'scene', 'alarms'].forEach((l) => this.mq.subscribe(this.k.base + l));
       this.onState(st);
     });
     this.mq.open();

@@ -20,18 +20,18 @@
   ];
   const FEATURES = [
     {
-      icon: '🎨', feature: true, title: 'Giao diện & nuôi Mochi', sub: 'Màu, đồng hồ, thời tiết, nuôi Mochi',
-      text: 'Cho Mochi ăn, xem Mochi đói hay buồn, đổi màu, bật đồng hồ, xem thời tiết, giờ ngủ, bật tắt các tính năng.',
+      icon: '🎨', feature: true, title: 'Giao diện Mochi', sub: 'Màu, đồng hồ, thời tiết, giờ ngủ',
+      text: 'Đổi màu và độ sáng, bật đồng hồ, chọn kiểu và màu nền đồng hồ, xem thời tiết, giờ ngủ.',
       href: 'giao-dien.html', go: 'Mở ›',
     },
     {
-      icon: '✉', feature: true, title: 'Nhắn chữ lên Mochi', sub: 'Qua Wi-Fi, gửi từ bất cứ đâu',
-      text: 'Gõ một câu cho chữ chạy dưới mặt Mochi, hoặc chữ to trên nền màu bạn chọn.',
-      href: 'nhan-chu.html', go: 'Mở ›',
+      icon: '✨', feature: true, title: 'Tính năng Mochi', sub: 'Nhắn chữ, nuôi Mochi, lời nhắc',
+      text: 'Nhắn chữ lên Mochi, cho Mochi ăn, lời nhắc và báo thức, Pomodoro, hẹn giờ, gọi để trò chuyện.',
+      href: 'tinh-nang.html', go: 'Mở ›',
     },
     {
       icon: '⚙', feature: true, title: 'Cài đặt Mochi', sub: 'Điều khiển từ xa qua Wi-Fi',
-      text: 'Âm lượng, hẹn giờ, cài lại Wi-Fi, khởi động lại, đổi mã của Mochi.',
+      text: 'Âm lượng, cập nhật, cài lại Wi-Fi, khởi động lại, đổi mã của Mochi.',
       href: 'cai-dat.html', go: 'Mở ›',
     },
   ];

@@ -1,13 +1,16 @@
-// Nhắn chữ page (nhan-chu.html): kept out of the page so its CSP can forbid inline scripts.
-// Must match mochi_remote.h in the firmware
-const { Link, KEY_RE, OLD_CODE_RE, normKey, prettyKey } = window.MochiLink;
+// "Nhắn chữ" card of the Tính năng page (tinh-nang.html): kept out of the page so its CSP can forbid
+// inline scripts. The link to Mochi is the one mochi-panel.js opens (window.MochiPanel), loaded first.
+// Messages must match mochi_remote.h in the firmware.
+(function () {
 const MAX_BYTES = 300;
 
 const $ = (id) => document.getElementById(id);
-const enc = new TextEncoder(), dec = new TextDecoder();
+const enc = new TextEncoder();
+const link = () => window.MochiPanel && window.MochiPanel.link();
+const ready = () => { const l = link(); return !!(l && l.ready && l.send); };  // Mochi's state arrived: messages can be sealed for it
 
 // ---------- page ----------
-let mq = null, code = '', mochiOnline = null, waitingAck = null;
+let waitingAck = null;
 const MAX_MSG = 640;   // whole message incl. settings (firmware: kMaxMessage)
 const st = Object.assign({ mode: 'mochi', bg: '#f7b6cb', bg2: '#8a5cf0', grad: false, dir: 'h', fg: '#ffffff', sz: 48, sp: 40 },
   JSON.parse(localStorage.getItem('mochiStyle') || '{}'));
@@ -17,28 +20,14 @@ function toast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2800);
 }
-function setStatus(kind, title, sub) {
-  $('status').className = 'status ' + kind;
-  $('stTitle').textContent = title; $('stSub').textContent = sub;
-  updateSend();
-}
-function showMochiState() {
-  if (!mq || !mq.connected) return;
-  if (window.MochiSite) window.MochiSite.status(mochiOnline, '');
-  if (mochiOnline === true) setStatus('on', 'Mochi đang trực tuyến', 'Mã ' + prettyKey(code) + ' · sẵn sàng nhận chữ');
-  else if (mochiOnline === false) setStatus('off', 'Mochi đang tắt hoặc mất mạng', 'Chữ gửi bây giờ sẽ không tới. Bật Mochi rồi thử lại.');
-  else setStatus('busy', 'Đã kết nối máy chủ', 'Chưa thấy Mochi mã ' + prettyKey(code) + '. Kiểm tra lại mã hoặc chờ Mochi khởi động xong.');
-}
-
 function bytesOf(s) { return enc.encode(s).length; }
 function updateSend() {
   const s = $('msg').value.trim(), n = bytesOf(s);
   $('count').textContent = n + ' / ' + MAX_BYTES;
   $('count').className = n > MAX_BYTES ? 'over' : '';
-  const ready = !!(mq && mq.ready);  // Mochi's state arrived: messages can be sealed for it
-  $('btnSend').disabled = !ready || !s || n > MAX_BYTES;
-  $('btnClear').disabled = !ready;
-  $('btnConnect').textContent = mq && mq.connected ? 'Đổi mã' : 'Kết nối';
+  const ok = ready();
+  $('btnSend').disabled = !ok || !s || n > MAX_BYTES;
+  $('btnClear').disabled = !ok;
   const p = $('preview');
   p.textContent = s || 'xin chào!';
   p.className = s.length > 14 ? '' : 'short';
@@ -100,32 +89,6 @@ function buildMessage(text, secs) {
   return JSON.stringify(m);
 }
 
-function connect() {
-  const c = normKey($('code').value);
-  if (OLD_CODE_RE.test(c)) {  // firmware before the encrypted link
-    setStatus('off', 'Mã 6 ký tự là của firmware cũ', 'Vào trang Cài đặt, nhập mã này để cập nhật Mochi lên bản mã hoá');
-    return;
-  }
-  if (!KEY_RE.test(c)) { toast('Mã gồm 12 chữ/số, xem trong menu của Mochi (mục Code web)'); $('code').focus(); return; }
-  if (mq) mq.close();
-  code = c; mochiOnline = null;
-  window.MochiLink.saveCode(code);
-  setStatus('busy', 'Đang kết nối…', 'Tới máy chủ nhắn tin');
-  mq = new Link(code, onMessage, (st) => {
-    if (st === 'ready') {
-      showMochiState();
-      setTimeout(showMochiState, 2500);
-    } else if (st === 'nocrypto') {
-      setStatus('', 'Trình duyệt không hỗ trợ mã hoá', 'Mở trang bằng Chrome, Safari hoặc Edge bản mới');
-    } else if (st === 'closed') {
-      setStatus('', 'Mất kết nối', 'Bấm Kết nối để thử lại');
-    } else {
-      setStatus('', 'Máy chủ từ chối kết nối', 'Thử lại sau ít phút');
-    }
-  });
-  mq.open();
-}
-
 // paint the preview in Mochi's real body colour (black body: white eyes on black, as on Mochi)
 function setBody(i) {
   const c = window.MochiLink.BODY_COLORS[i];
@@ -135,24 +98,21 @@ function setBody(i) {
   root.setProperty('--ink', c.dark ? '#ffffff' : '#2c2838');
 }
 
-function onMessage(leaf, payload) {
-  if (leaf === 'status') { mochiOnline = payload === 'online'; showMochiState(); }
-  else if (leaf === 'state') {
-    try { setBody(JSON.parse(payload).color); } catch (e) {}
-    showMochiState();
-  }
+window.MochiPanel.on((leaf, payload) => {
+  if (leaf === 'state') { try { setBody(JSON.parse(payload).color); } catch (e) {} }
   else if (leaf === 'ack' && waitingAck) {
     clearTimeout(waitingAck.timer);
     toast(waitingAck.clear ? 'Đã tắt chạy chữ trên Mochi' : 'Mochi đã nhận ✓');
     waitingAck = null;
   }
-}
+  updateSend();
+});
 
 function send(text, secs) {
-  if (!mq || !mq.ready) return;
+  if (!ready()) return;
   const msg = buildMessage(text, secs);
   if (bytesOf(text) > MAX_BYTES || bytesOf(msg) > MAX_MSG) { toast('Câu dài quá, bớt chữ đi nhé'); return; }
-  mq.send('text', msg);
+  link().send('text', msg);
   if (waitingAck) clearTimeout(waitingAck.timer);
   waitingAck = { clear: !text, timer: setTimeout(() => {
     waitingAck = null;
@@ -161,13 +121,10 @@ function send(text, secs) {
   toast('Đang gửi…');
 }
 
-$('btnConnect').addEventListener('click', connect);
-$('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
-window.MochiLink.keyInput($('code'));
 $('btnSend').addEventListener('click', () => send($('msg').value.trim().replace(/\s+/g, ' '), +$('secs').value));
 $('btnClear').addEventListener('click', () => {  // stops both styles (firmware: text_off)
-  if (!mq || !mq.ready) return;
-  mq.send('cmd', JSON.stringify({ cmd: 'text_off' }));
+  if (!ready()) return;
+  link().send('cmd', JSON.stringify({ cmd: 'text_off' }));
   if (waitingAck) clearTimeout(waitingAck.timer);
   waitingAck = { clear: true, timer: setTimeout(() => { waitingAck = null; toast('Chưa thấy Mochi trả lời. Mochi có đang bật không?'); }, 6000) };
 });
@@ -190,7 +147,5 @@ $('syms').addEventListener('click', (e) => {  // insert the symbol where the cur
 });
 
 renderControls();
-const saved = window.MochiLink.savedCode();
-if (KEY_RE.test(saved)) { $('code').value = prettyKey(saved); connect(); }
-else if (OLD_CODE_RE.test(saved)) { $('code').value = saved; connect(); }
 updateSend();
+})();

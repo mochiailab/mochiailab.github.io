@@ -25,6 +25,11 @@ function ink(face, pastel) {  // InkFor
     default: return pastel ? '#2c2838' : WHITE;
   }
 }
+// the rim round mochi's body (firmware Rim()): the colour three times further from white
+function deepen(hex) {
+  const n = parseInt(hex.slice(1), 16), d = (v) => Math.max(0, 255 - (255 - v) * 3);
+  return 'rgb(' + d(n >> 16) + ',' + d((n >> 8) & 255) + ',' + d(n & 255) + ')';
+}
 function hue(h) { h -= Math.floor(h); return `hsl(${Math.round(h * 360)} 100% 50%)`; }
 
 class MochiScreen {
@@ -128,9 +133,9 @@ class MochiScreen {
     const k = ink(face, pastel), cut = body;
     const blushC = pastel ? '#ff7896' : PINK, tearC = pastel ? '#3c82ff' : BLUE;
     if (pastel) {
-      const squish = talking ? Math.abs(Math.sin(t * 11)) * 1.5 : 0;
-      this.box(cx, 50 + bob + squish + hop, 74, 47 - squish, 34, body);
-      this.box(cx, 64, 74, 16, 6, body);
+      // the whole screen, rounded corners, 2 px rim in a deeper colour (firmware: Rim(), BOTTOM_R 8, RIM_W 2)
+      this.box(80, 40, 80, 40, 8, deepen(body));
+      this.box(80, 40, 78, 38, 6, body);
     }
     this.drawGlow(t);
     if (sc.tm > 0) this.line(4, 3, 4 + (W - 8) * Math.min(1, sc.tm / 1500), 3, 1.3, pastel ? '#e66e00' : '#ffaa00');
@@ -259,7 +264,10 @@ class MochiScreen {
   drawSubtitle(t, body, pastel) {
     const g = this.g, y0 = 62;
     g.save();
-    g.fillStyle = pastel ? body : '#000'; g.beginPath(); g.roundRect(6, y0, 148, 18, 6); g.fill();
+    if (pastel) { g.fillStyle = deepen(body); g.beginPath(); g.roundRect(0, y0, 160, 18, [0, 0, 8, 8]); g.fill(); }
+    g.fillStyle = pastel ? body : '#000'; g.beginPath();
+    if (pastel) g.roundRect(2, y0, 156, 16, [0, 0, 6, 6]); else g.roundRect(6, y0, 148, 18, 6);
+    g.fill();
     g.beginPath(); g.rect(10, y0, 140, 18); g.clip();
     g.font = '600 12px "Segoe UI", system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left';
     g.fillStyle = pastel ? '#2c2838' : WHITE;

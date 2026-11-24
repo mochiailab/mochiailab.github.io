@@ -10,7 +10,7 @@
   const MENU = [
     { id: 'home', href: './', text: 'Trang chủ', icon: '🏠' },
     { id: 'look', href: 'giao-dien.html', text: 'Giao diện', icon: '🎨' },
-    { id: 'text', href: 'nhan-chu.html', text: 'Nhắn chữ', icon: '✉️' },
+    { id: 'features', href: 'tinh-nang.html', text: 'Tính năng', icon: '✨' },
     { id: 'settings', href: 'cai-dat.html', text: 'Cài đặt', icon: '⚙️' },
   ];
   // pages that live inside a menu item (the firmware pages are part of Cài đặt)

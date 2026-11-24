@@ -17,18 +17,19 @@
 <script src="theme.js?v=20261140"></script>
 <link rel="stylesheet" href="site.css?v=20261140">
 <link rel="stylesheet" href="glass.css?v=20261141">
-<link rel="stylesheet" href="mochi-panel.css?v=20261140">
+<link rel="stylesheet" href="mochi-panel.css?v=20261151">
 </head>
 <body>
 <header data-active="settings"></header>
 
 <main>
   <h1>Cài đặt <b>Mochi</b></h1>
-  <p class="lead">Âm lượng, hẹn giờ, cài lại Wi-Fi, khởi động lại và mã của Mochi. Màu, đồng hồ, thời tiết nằm ở trang <a href="giao-dien.html">Giao diện</a>.</p>
+  <p class="lead">Mã của Mochi, âm lượng, cập nhật, Wi-Fi, khởi động lại và nạp firmware. Màu, đồng hồ, thời tiết ở trang <a href="giao-dien.html">Giao diện</a>; nhắn chữ, nuôi Mochi, lời nhắc ở trang <a href="tinh-nang.html">Tính năng</a>.</p>
 
-  <div class="card">
-    <label class="lbl" for="code">Mã của Mochi</label>
-    <div class="codebox" style="margin-top:8px">
+  <div class="card" id="ma">
+    <h2><span>🔑</span>Mã của Mochi</h2>
+    <p class="note" style="margin:-4px 0 10px">Nhập một lần ở đây, các trang Giao diện, Tính năng và Trang chủ dùng chung mã này.</p>
+    <div class="codebox">
       <input id="code" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH-JKMN">
       <button class="primary" id="btnConnect">Kết nối</button>
     </div>
@@ -47,30 +48,6 @@
     <h2><span>🔊</span>Âm thanh</h2>
     <div class="row"><span class="lbl grow">Âm lượng</span><span class="big" id="volVal">–</span></div>
     <input type="range" id="volume" min="0" max="100" step="5" value="60" aria-label="Âm lượng">
-  </div>
-
-  <div class="card">
-    <h2><span>⏳</span>Hẹn giờ</h2>
-    <div class="row">
-      <span class="lbl">Đang hẹn</span>
-      <span class="muted grow" id="timerLeft">Không có hẹn giờ</span>
-    </div>
-    <div class="row" id="timerQuick">
-      <button data-min="1">1 phút</button><button data-min="5">5 phút</button><button data-min="10">10 phút</button><button data-min="25">25 phút</button>
-    </div>
-    <div class="row">
-      <input type="number" id="timerMin" min="1" max="600" value="15" aria-label="Số phút"> <span class="muted">phút</span>
-      <button class="primary" id="timerSet">Đặt</button>
-      <button class="danger" id="timerCancel">Huỷ hẹn giờ</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2><span>✨</span>Khác</h2>
-    <div class="row">
-      <button class="danger grow" data-cmd="text_off">⏹ Tắt chạy chữ</button>
-      <button class="grow" data-cmd="pet">💗 Thả tim</button>
-    </div>
   </div>
 
   <div class="card">
@@ -95,7 +72,7 @@
       <li><b>Tới mục Code web:</b> chạm nhẹ từng lần cho tới khi màn hiện <code>Code web</code>: bên trái là mã QR, bên phải là mã 12 ký tự. <b>Quét mã QR bằng camera điện thoại</b> là trang này tự mở, tự điền mã và kết nối; hoặc gõ mã vào ô ở trên.</li>
       <li><b>Bắt đầu đổi:</b> ở mục đó giữ nút chạm 2 giây. Màn hỏi <code>Tạo code mới?</code></li>
       <li><b>Xác nhận:</b> giữ thêm 2 giây nữa (trong vòng 10 giây). Màn hiện <code>Code mới</code> kèm mã QR và mã mới khoảng 15 giây: quét QR hoặc ghi lại.</li>
-      <li><b>Dùng mã mới:</b> trên trang này hoặc trang Nhắn chữ, bấm <b>Đổi mã</b> và nhập mã mới.</li>
+      <li><b>Dùng mã mới:</b> ở ô <a href="#ma">Mã của Mochi</a> đầu trang này, bấm <b>Đổi mã</b> và nhập mã mới.</li>
     </ol>
     <p class="note" style="margin:10px 0 0">Mã cũ hết dùng ngay lập tức. Mã mới chỉ hiện trên màn Mochi, không bao giờ được gửi qua mạng, nên người đang giữ mã cũ không thể biết. Lỡ giữ nhầm? Chạm sang mục khác hoặc chờ 10 giây là không đổi.</p>
   </div>
@@ -112,9 +89,9 @@
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261140"></script>
-<script src="mochi-link.js?v=20261140"></script>
-<script src="mochi-panel.js?v=20261140"></script>
-<script src="cards.js?v=20261140"></script>
+<script src="site.js?v=20261150"></script>
+<script src="mochi-link.js?v=20261141"></script>
+<script src="mochi-panel.js?v=20261151"></script>
+<script src="cards.js?v=20261150"></script>
 </body>
 </html>

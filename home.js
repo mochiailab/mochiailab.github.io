@@ -27,7 +27,7 @@ function render() {
     [['f', 'sF'], ['j', 'sJ'], ['t', 'sT'], ['e', 'sE']].forEach(([k, id]) => {
       $(id).querySelector('i').style.width = p[k] + '%'; $(id).querySelector('b').textContent = p[k] + '%';
     });
-  } else if (state) { $('moodE').textContent = '💤'; $('moodT').textContent = 'Đang tắt nuôi Mochi'; $('moodS').textContent = 'Bật lại ở trang Giao diện'; }
+  } else if (state) { $('moodE').textContent = '💤'; $('moodT').textContent = 'Đang tắt nuôi Mochi'; $('moodS').textContent = 'Bật lại ở trang Tính năng'; }
   if (state) {
     $('qCall').classList.toggle('on', (state.call || 0) > 0);
     $('qTsnd').classList.toggle('on', state.tsnd !== 0);
@@ -81,7 +81,9 @@ if (window.MochiSite) window.MochiSite.addCommands([
   ['⏰', 'Xem giờ trên Mochi', 'Mochi', () => send('clock_show') && toast('Mochi hiện giờ 8 giây')],
   ['😴', 'Cho Mochi ngủ', 'Mochi', () => send('sleep') && toast('Mochi đi ngủ 😴')],
   ['☀️', 'Đánh thức Mochi', 'Mochi', () => send('wake') && toast('Đã đánh thức Mochi')],
-  ['🍅', 'Hẹn giờ 25 phút', 'Mochi', () => send('timer', { v: 1500 }) && toast('Hẹn giờ 25 phút 🍅')],
+  ['🍅', 'Bắt đầu Pomodoro', 'Mochi', () => send('pomo', { v: 1 }) && toast('Pomodoro: tập trung 25 phút 🍅')],
+  ['✉️', 'Nhắn chữ lên Mochi', 'Mochi', () => { location.href = 'tinh-nang.html#chu'; }],
+  ['⏰', 'Thêm lời nhắc hay báo thức', 'Mochi', () => { location.href = 'tinh-nang.html#alarmCard'; }],
 ]);
 
 const key = ML.savedCode();

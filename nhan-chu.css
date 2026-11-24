@@ -1,0 +1,55 @@
+/* Tính năng page (tinh-nang.html): the jump bar and the "Nhắn chữ" card (nhan-chu.js).
+   Loaded after mochi-panel.css; the text card's rules are scoped to #chu. */
+:root { --screen: #0b0b10; --body: #fac8d4; --ink: #2c2838; }
+.card[id] { scroll-margin-top: 120px; }
+.card .sub { margin: -6px 0 12px; }
+
+/* jump bar: one chip per card */
+.jump { position: sticky; top: 72px; z-index: 5; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+  padding: 6px; margin: 0 -4px 14px; border-radius: 16px; background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--line); -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6); }
+.jump::-webkit-scrollbar { display: none; }
+.jump a { flex: none; padding: 7px 12px; border-radius: 999px; font-size: 14px; font-weight: 700; color: var(--text); text-decoration: none; white-space: nowrap; }
+.jump a:hover, .jump a.on { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+
+/* mini mochi screen preview */
+#chu .screen { position: relative; aspect-ratio: 2 / 1; border-radius: 12px; background: var(--screen); overflow: hidden; border: 6px solid #1c1a22; }
+#chu .screen .blob { position: absolute; left: 4%; right: 4%; top: 6%; bottom: 0; background: var(--body); border-radius: 38% 38% 8% 8% / 60% 60% 10% 10%; }
+#chu .screen .eye { position: absolute; top: 24%; width: 7%; height: 22%; border-radius: 99px; background: var(--ink); }
+#chu .screen .eye.l { left: 30%; } #chu .screen .eye.r { right: 30%; }
+#chu .screen .bar { position: absolute; left: 4%; right: 4%; bottom: 0; height: 28%; display: flex; align-items: center; overflow: hidden; background: var(--body); }
+#chu .screen .bar span { white-space: nowrap; padding-left: 100%; color: #fff; font-weight: 600; font-size: clamp(13px, 4.2vw, 19px); text-shadow: 0 1px 0 rgba(0,0,0,.25); animation: scroll 9s linear infinite; }
+#chu .screen .bar span.short { padding-left: 0; margin: 0 auto; animation: none; }
+@keyframes scroll { to { transform: translateX(-100%); } }
+#chu .poster { position: absolute; inset: 0; display: none; align-items: center; overflow: hidden; }
+#chu .screen.color .poster { display: flex; }
+#chu .screen.color .blob, #chu .screen.color .eye, #chu .screen.color .bar { display: none; }
+#chu .poster span { white-space: nowrap; font-family: "DejaVu Sans", Verdana, sans-serif; line-height: 1; padding-left: 100%; animation: scroll linear infinite; }
+#chu .poster span.short { padding-left: 0; margin: 0 auto; animation: none; }
+
+/* style tabs */
+#chu .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; border-radius: 14px; background: var(--surface-solid); border: 1px solid var(--line); margin-bottom: 12px; }
+#chu .tabs button { padding: 10px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); box-shadow: none; }
+#chu .tabs button.on { color: var(--accent-text); background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+#chu .opts { display: grid; gap: 14px; margin-top: 14px; padding: 14px; border-radius: 14px; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-solid) 60%, transparent); }
+#chu .opt .lbl { display: block; margin-bottom: 8px; }
+#chu .colors { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+#chu .colors input[type=color] { width: 46px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: none; cursor: pointer; }
+#chu .colors .sw { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 2px solid var(--surface-solid); box-shadow: 0 0 0 1px var(--line); }
+#chu .check { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+
+#chu .msgLbl { display: block; margin: 16px 0 6px; }
+#chu textarea { width: 100%; min-height: 90px; resize: vertical; font: inherit; color: var(--text); background: var(--surface-solid);
+  border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; box-sizing: border-box; }
+#chu textarea:focus { outline: 2px solid color-mix(in srgb, var(--accent) 50%, transparent); border-color: transparent; }
+#chu .meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; margin: 4px 2px 12px; }
+#chu .meta .over { color: var(--bad); font-weight: 700; }
+#chu .stop { width: 100%; margin-top: 10px; }
+#chu .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+#chu .chips button { font-weight: 600; font-size: 14px; padding: 7px 12px; border-radius: 999px; }
+#chu .chiplabel { margin: 14px 2px 0; font-size: 13px; font-weight: 700; color: var(--muted); }
+#chu .symnote { margin: 6px 2px 0; font-size: 13px; }
+#chu .chips.syms button { min-width: 40px; font-size: 18px; padding: 4px 10px; font-family: "DejaVu Sans", "Segoe UI Symbol", sans-serif; }
+.hidden { display: none !important; }
