@@ -1,6 +1,6 @@
 /* Tính năng page (tinh-nang.html): the jump bar and the "Nhắn chữ" card (nhan-chu.js).
    Loaded after mochi-panel.css; the text card's rules are scoped to #chu. */
-:root { --screen: #0b0b10; --body: #fac8d4; --ink: #2c2838; }
+:root { --screen: #0b0b10; --body: #fac8d4; --rim: #ee5a7c; --ink: #2c2838; }
 .card[id] { scroll-margin-top: 120px; }
 .card .sub { margin: -6px 0 12px; }
 
@@ -14,10 +14,12 @@
 
 /* mini mochi screen preview */
 #chu .screen { position: relative; aspect-ratio: 2 / 1; border-radius: 12px; background: var(--screen); overflow: hidden; border: 6px solid #1c1a22; }
-#chu .screen .blob { position: absolute; left: 4%; right: 4%; top: 6%; bottom: 0; background: var(--body); border-radius: 38% 38% 8% 8% / 60% 60% 10% 10%; }
+/* like Mochi's screen: the body fills it, corners 8 of 160 x 80 px, a 2 px rim (firmware Rim()) */
+#chu .screen .blob { position: absolute; inset: 0; background: var(--body); border: 2.6px solid var(--rim); border-radius: 5% / 10%; }
 #chu .screen .eye { position: absolute; top: 24%; width: 7%; height: 22%; border-radius: 99px; background: var(--ink); }
 #chu .screen .eye.l { left: 30%; } #chu .screen .eye.r { right: 30%; }
-#chu .screen .bar { position: absolute; left: 4%; right: 4%; bottom: 0; height: 28%; display: flex; align-items: center; overflow: hidden; background: var(--body); }
+#chu .screen .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 22.5%; display: flex; align-items: center; overflow: hidden; background: var(--body);
+  border: 2.6px solid var(--rim); border-top: 0; border-radius: 0 0 5% 5% / 0 0 44% 44%; padding: 0 4%; }
 #chu .screen .bar span { white-space: nowrap; padding-left: 100%; color: #fff; font-weight: 600; font-size: clamp(13px, 4.2vw, 19px); text-shadow: 0 1px 0 rgba(0,0,0,.25); animation: scroll 9s linear infinite; }
 #chu .screen .bar span.short { padding-left: 0; margin: 0 auto; animation: none; }
 @keyframes scroll { to { transform: translateX(-100%); } }

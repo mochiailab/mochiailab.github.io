@@ -96,6 +96,9 @@ function setBody(i) {
   const root = document.documentElement.style;
   root.setProperty('--body', c.hex);
   root.setProperty('--ink', c.dark ? '#ffffff' : '#2c2838');
+  // the rim: the colour three times further from white (firmware Rim()); none on the black body
+  const n = parseInt(c.hex.slice(1), 16), d = (v) => Math.max(0, 255 - (255 - v) * 3);
+  root.setProperty('--rim', c.dark ? c.hex : `rgb(${d(n >> 16)},${d((n >> 8) & 255)},${d(n & 255)})`);
 }
 
 window.MochiPanel.on((leaf, payload) => {
