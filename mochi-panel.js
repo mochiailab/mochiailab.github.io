@@ -198,8 +198,8 @@ function connect(key) {
     if (st === 'ready') {
       setTimeout(refreshStatus, 2500);
     } else if (st === 'nocrypto') setStatus('', 'Trình duyệt không hỗ trợ mã hoá', 'Mở trang bằng Chrome, Safari hoặc Edge bản mới');
-    else if (st === 'closed') setStatus('', 'Mất kết nối', 'Bấm Kết nối để thử lại');
-    else setStatus('', 'Máy chủ từ chối kết nối', 'Thử lại sau ít phút');
+    else if (st === 'closed') setStatus('busy', 'Mất kết nối, đang kết nối lại…', 'Trang tự thử lại khi có mạng');
+    else setStatus('busy', 'Máy chủ chưa nhận kết nối', 'Trang tự thử lại sau ít giây');
     refreshStatus();
     emit('link', st);
   });
@@ -444,7 +444,10 @@ if (KEY_RE.test(fromQr) && location.hash.length === 13) {
   const saved = window.MochiLink.savedCode();
   if (KEY_RE.test(saved)) { $('code').value = prettyKey(saved); connect(saved); }
   else if (OLD_CODE_RE.test(saved)) { $('code').value = saved; connect(saved); }
-  else if (!KEY_BOX) setStatus('off', 'Chưa có mã của Mochi', 'Bấm 🔑 Mã để nhập mã ở trang Cài đặt, hoặc quét mã QR trên màn Mochi');
+  else if (!KEY_BOX) {  // these pages have no key box: point to Cài đặt
+    if (window.MochiSite) window.MochiSite.status('nokey');
+    toast('Chưa có mã của Mochi: nhập ở trang Cài đặt 🔑');
+  }
 }
 
 })();

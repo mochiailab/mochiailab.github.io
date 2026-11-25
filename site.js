@@ -51,7 +51,7 @@
   const search = el('button', 'gbtn gsearch', '🔎 <span>Tìm hay ra lệnh…</span><kbd>Ctrl K</kbd>');
   search.type = 'button';
   const pill = el('a', 'gpill', '<span class="dot"></span><span class="txt">Mochi</span>');
-  pill.href = 'cai-dat.html';
+  pill.href = 'cai-dat.html#ma';  // the key and Mochi's full status live on Cài đặt
   pill.hidden = true;
   const paint = el('button', 'gbtn', '🎨');
   paint.type = 'button'; paint.title = 'Đổi màu giao diện'; paint.setAttribute('aria-label', 'Đổi màu giao diện');
@@ -147,11 +147,16 @@
   window.MochiSite = {
     // extra palette commands from a page: [[icon, text, group, fn], ...]
     addCommands(cmds) { COMMANDS.unshift(...cmds); },
-    // the status pill: online true / false / null (unknown, hidden), plus an emoji for the mood
+    // the status pill: online true (green dot) / false (yellow) / null (connecting, yellow) /
+    // 'nokey' (grey: no key saved yet), plus an emoji for the mood. A tap opens the key on Cài đặt.
     status(online, emoji) {
-      pill.hidden = online == null;
-      pill.classList.toggle('on', !!online);
-      pill.querySelector('.txt').textContent = online ? 'Mochi ' + (emoji || '') : 'Mochi đang tắt';
+      pill.hidden = false;
+      pill.classList.toggle('on', online === true);
+      pill.classList.toggle('off', online !== true && online !== 'nokey');
+      const t = online === true ? 'Mochi ' + (emoji || '') : online === false ? 'Mochi ngoại tuyến'
+        : online === 'nokey' ? 'Chưa có mã' : 'Đang kết nối…';
+      pill.querySelector('.txt').textContent = t;
+      pill.title = online === true ? 'Mochi đang trực tuyến' : t;
     },
   };
 })();

@@ -68,6 +68,7 @@ header { border-width: 0 0 1px; border-radius: 0; }
 .hdr-tools { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .gpill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--text); text-decoration: none; }
 .gpill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.gpill.off .dot { background: #f5b301; box-shadow: 0 0 0 4px rgba(245, 179, 1, .22); }
 .gpill.on .dot { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 22%, transparent); animation: dotPulse 2s infinite; }
 @keyframes dotPulse { 50% { box-shadow: 0 0 0 7px transparent; } }
 .gbtn { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; cursor: pointer; font-size: 18px; color: var(--text); padding: 0;

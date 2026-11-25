@@ -13,15 +13,17 @@ function mqttPacket(type, body) {
 class Mqtt {
   constructor(url, clientId, onMessage, onState) {
     this.url = url; this.clientId = clientId; this.onMessage = onMessage; this.onState = onState;
-    this.buf = new Uint8Array(0); this.pid = 1; this.ready = false;
+    this.buf = new Uint8Array(0); this.pid = 1; this.ready = false; this.last = Date.now();
   }
   open() {
     this.ws = new WebSocket(this.url, 'mqtt');
     this.ws.binaryType = 'arraybuffer';
     this.ws.onopen = () => this.ws.send(mqttPacket(0x10, [...mqttStr('MQTT'), 4, 0x02, 0, 60, ...mqttStr(this.clientId)]));
-    this.ws.onmessage = (e) => this.feed(new Uint8Array(e.data));
+    this.ws.onmessage = (e) => { this.last = Date.now(); this.feed(new Uint8Array(e.data)); };
     this.ws.onclose = () => { this.ready = false; clearInterval(this.ping); this.onState('closed'); };
   }
+  // a socket a phone put to sleep can stay "open" without delivering anything: give up on it now
+  drop() { this.close(); this.onState('closed'); }
   close() {
     if (this.ws) {
       try { this.ws.send(new Uint8Array([0xE0, 0])); } catch (e) {}
@@ -50,7 +52,10 @@ class Mqtt {
       if ((type & 0xf0) === 0x20) {                 // CONNACK
         if (body[1] === 0) {
           this.ready = true;
-          this.ping = setInterval(() => { try { this.ws.send(new Uint8Array([0xC0, 0])); } catch (e) {} }, 30000);
+          this.ping = setInterval(() => {  // the broker answers each ping: silence for 75 s = dead link
+            if (Date.now() - this.last > 75000) { this.drop(); return; }
+            try { this.ws.send(new Uint8Array([0xC0, 0])); } catch (e) {}
+          }, 30000);
           this.onState('ready');
         } else this.onState('refused');
       } else if ((type & 0xf0) === 0x30) {          // PUBLISH
@@ -108,11 +113,36 @@ class Link {
     if (!window.crypto || !crypto.subtle) { this.onState('nocrypto'); return; }
     this.k = await deriveKeys(this.key);
     if (this.closed) return;
-    this.mq = new Mqtt(BROKER, 'web-' + Math.random().toString(36).slice(2, 10), (tp, payload) => this.got(tp, payload), (st) => {
-      if (st === 'ready') ['status', 'state', 'ack', 'scene', 'alarms'].forEach((l) => this.mq.subscribe(this.k.base + l));
+    // reconnect at once when the page is shown again or the network comes back (phones drop
+    // the socket of a page in the background); otherwise retry with a growing delay
+    this.wakeFn = () => { if (document.visibilityState !== 'hidden') this.wake(); };
+    ['visibilitychange', 'online', 'pageshow', 'focus'].forEach((ev) => (ev === 'visibilitychange' ? document : window).addEventListener(ev, this.wakeFn));
+    this.tries = 0;
+    this.connectMq();
+  }
+  connectMq() {
+    const mq = new Mqtt(BROKER, 'web-' + Math.random().toString(36).slice(2, 10), (tp, payload) => this.got(tp, payload), (st) => {
+      if (mq !== this.mq) return;  // an old socket we replaced
+      if (st === 'ready') { this.tries = 0; ['status', 'state', 'ack', 'scene', 'alarms'].forEach((l) => mq.subscribe(this.k.base + l)); }
+      else if (!this.closed) this.retry();
       this.onState(st);
     });
-    this.mq.open();
+    this.mq = mq;
+    mq.open();
+  }
+  retry() {
+    clearTimeout(this.rt);
+    const wait = Math.min(30000, 2000 * 2 ** Math.min(this.tries++, 4));  // 2, 4, 8, 16, 30 s
+    this.rt = setTimeout(() => { if (!this.closed) this.connectMq(); }, wait);
+  }
+  wake() {
+    if (this.closed || !this.k) return;
+    if (this.mq && this.mq.ready && Date.now() - this.mq.last < 40000) return;  // still alive
+    clearTimeout(this.rt);
+    if (this.mq) { const old = this.mq; this.mq = null; old.close(); }
+    this.tries = 0;
+    this.onState('closed');
+    this.connectMq();
   }
   async got(tp, payload) {
     const leaf = tp.slice(tp.lastIndexOf('/') + 1);
@@ -128,7 +158,11 @@ class Link {
     seal(this.k.aes, leaf, this.sid + '|' + Date.now() + '|' + text).then((p) => this.mq && this.mq.publish(this.k.base + leaf, p));
     return true;
   }
-  close() { this.closed = true; if (this.mq) this.mq.close(); this.mq = null; }
+  close() {
+    this.closed = true; clearTimeout(this.rt);
+    if (this.wakeFn) ['visibilitychange', 'online', 'pageshow', 'focus'].forEach((ev) => (ev === 'visibilitychange' ? document : window).removeEventListener(ev, this.wakeFn));
+    if (this.mq) this.mq.close(); this.mq = null;
+  }
 }
 
 // Firmware before 2026.11.24-7 (6-letter code, plain topics mochiailab/v1/<CODE>/...): only used
