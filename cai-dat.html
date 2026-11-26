@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="theme.js?v=20261270"></script>
-<link rel="stylesheet" href="site.css?v=20261270">
+<link rel="stylesheet" href="site.css?v=20261280">
 <link rel="stylesheet" href="glass.css?v=20261270">
 <link rel="stylesheet" href="mochi-panel.css?v=20261260">
 </head>
@@ -23,11 +23,12 @@
 <header data-active="settings"></header>
 
 <main>
-  <h1>Cài đặt <b>Mochi</b></h1>
+  <h1><span class="devonly">Cài đặt</span><span class="publiconly">Nạp firmware cho</span> <b>Mochi</b></h1>
   <p class="lead needkey">Mã của Mochi, âm lượng, cập nhật, Wi-Fi, khởi động lại và nạp firmware. Màu, đồng hồ, thời tiết ở trang <a href="giao-dien.html">Giao diện</a>; nhắn chữ, nuôi Mochi, lời nhắc ở trang <a href="tinh-nang.html">Tính năng</a>.</p>
-  <p class="lead intro">Nhập mã của Mochi để điều khiển Mochi qua điện thoại, hoặc nạp firmware cho Mochi mới ở cuối trang. Nhập mã xong, các trang Giao diện và Tính năng hiện ra trên menu.</p>
+  <p class="lead intro devonly">Nhập mã của Mochi để điều khiển Mochi qua điện thoại, hoặc nạp firmware cho Mochi mới ở cuối trang. Nhập mã xong, các trang Giao diện và Tính năng hiện ra trên menu.</p>
+  <p class="lead publiconly">Chọn mạch của Mochi để nạp firmware ngay trên trình duyệt (Chrome hoặc Edge trên máy tính, cắm Mochi bằng cáp USB-C), kèm sơ đồ đấu dây bằng ảnh linh kiện thật.</p>
 
-  <div class="card" id="ma">
+  <div class="card devonly" id="ma">
     <h2><span>🔑</span>Mã của Mochi</h2>
     <p class="note" style="margin:-4px 0 10px">Nhập một lần ở đây, các trang Giao diện, Tính năng và Trang chủ dùng chung mã này.</p>
     <div class="codebox">
@@ -36,6 +37,7 @@
     </div>
     <label class="remember"><input type="checkbox" id="remember" checked> Ghi nhớ mã trên máy này <small>(bỏ chọn khi dùng máy người khác: mã mất khi đóng tab)</small></label>
     <button class="needkey forget" id="forget" type="button">Quên mã trên máy này</button>
+    <button class="forget" id="devOff" type="button">Tắt chế độ nhà phát triển</button>
     <div class="status" id="status"><i></i><div><b id="stTitle">Chưa kết nối</b><small id="stSub">Giữ nút chạm 2 giây, chạm tới mục Code web rồi <b>quét mã QR</b> trên màn Mochi bằng camera điện thoại (<a href="#doi-ma">hướng dẫn</a>)</small></div></div>
   </div>
 
@@ -66,7 +68,7 @@
   </div>
   </fieldset>
 
-  <div class="card" id="doi-ma">
+  <div class="card devonly" id="doi-ma">
     <h2><span>🔑</span>Xem và đổi mã của Mochi</h2>
     <p class="note" style="margin:0 0 10px">Mã 12 ký tự (dạng <code>ABCD-EFGH-JKMN</code>) là "chìa khoá" để nhắn chữ và điều khiển Mochi. Ai biết mã cũng điều khiển được, nên nếu lỡ để lộ, hãy đổi mã mới ngay trên Mochi.</p>
     <ol class="steps">
@@ -91,7 +93,7 @@
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261300"></script>
+<script src="site.js?v=20261280"></script>
 <script src="stats.js?v=20261290"></script>
 <script src="mochi-link.js?v=20261280"></script>
 <script src="mochi-panel.js?v=20261270"></script>

@@ -151,6 +151,11 @@ function tip(tm, w) {  // the smart card's line (firmware Tip())
 function teaTip(h) {
   return h < 9 ? 'Chào buổi sáng' : h < 11 ? 'Uống nước nha' : h < 13 ? 'Ăn trưa chưa?' : h < 17 ? 'Uống nước nha' : h < 20 ? 'Nghỉ mắt chút' : 'Sắp ngủ rồi nè';
 }
+// hue(h) as #rrggbb (for mix)
+function hslHex(h) {
+  h -= Math.floor(h); const f = (n) => { const k = (n + h * 12) % 12; return Math.round(255 * (0.5 - 0.5 * Math.max(-1, Math.min(k - 3, 9 - k, 1)))); };
+  return '#' + [f(0), f(8), f(4)].map((v) => v.toString(16).padStart(2, '0')).join('');
+}
 function hue(h) { h -= Math.floor(h); return `hsl(${Math.round(h * 360)} 100% 50%)`; }
 
 class MochiScreen {
@@ -285,7 +290,7 @@ class MochiScreen {
   drawFace(t, body, pastel) {
     const sc = this.scene, now = t;
     let face = sc.f || 0;
-    const talking = sc.s === 2, listening = sc.s === 1, music = !!sc.mu && talking;
+    const talking = sc.s === 2, listening = sc.s === 1, music = !!sc.mu && (talking || sc.s === 3);  // (a song from the music server plays as a notification: s 3)
     if (sc.al) face = F.SURPRISED;
     // idle glances + blinks, like the firmware (random, not in step with Mochi)
     if (now > this.nextLook) {
@@ -320,17 +325,45 @@ class MochiScreen {
     };
     const blush = () => { this.box(cx - 52, ey + 16, 7, 3, 3, blushC); this.box(cx + 52, ey + 16, 7, 3, 3, blushC); };
 
-    if (music) {
-      const sway = Math.round(Math.sin(t * 2.2) * 2);
-      this.arc(cx - ex + sway, ey + 8, 11, 200, 340, 3, k); this.arc(cx + ex + sway, ey + 8, 11, 200, 340, 3, k);
-      blush(); this.box(cx + sway * 0.5, my - 3, 4, 2 + Math.abs(Math.sin(t * 8)) * 3, 3, k);
-      for (let i = 0; i < 9; i++) { const h = 2 + Math.abs(Math.sin(t * (5 + i) + i)) * 9; this.line(cx - 24 + i * 6, 77, cx - 24 + i * 6, 77 - h, 1.6, hue(i / 9 + t * 0.15)); }
-      for (let i = 0; i < 4; i++) {
-        const p = (t * 0.22 + i * 0.25) % 1, side = i % 2 ? 1 : -1;
-        const nx = 80 + side * (62 + 6 * Math.sin(t * 2 + i * 1.7)), ny = 74 - p * 78;
-        if (ny < 10) continue;
-        const nc = hue(i * 0.27 + p * 0.4);
-        this.circle(nx, ny, 2.6, nc); this.line(nx + 2.2, ny, nx + 2.2, ny - 8, 0.8, nc); this.line(nx + 2.2, ny - 8, nx + 5.5, ny - 5, 0.8, nc);
+    if (music) {  // the music look (firmware BuildFace, music branch): headphones, ^ ^, rainbow equalizer
+      const bg = pastel ? body : '#fac8d4';
+      if (!pastel) this.box(80, 40, 80, 40, 8, bg);
+      const sway = Math.round(Math.sin(t * 2.2) * 1.5), bass = Math.abs(Math.sin(t * 4.2)) ** 3;  // (a beat; Mochi uses the real bass)
+      const fx = cx + sway, fy = ey + 4, K = '#2c2838';
+      const cloud = mix(bg, '#ffffff', 200 / 256);
+      this.circle(16, 11, 4.5, cloud); this.circle(23, 10, 5.5, cloud); this.circle(137, 10, 5.5, cloud); this.circle(144, 11, 4.5, cloud);
+      for (let q = 0; q < 2; q++) {
+        const tx = q ? 150 : 10, ty = q ? 30 : 28, r = 1.5 + 1.5 * Math.abs(Math.sin(t * 2.5 + q * 1.6)), tc = mix(bg, '#ffffff', 230 / 256);
+        this.line(tx - r, ty, tx + r, ty, 0.55, tc); this.line(tx, ty - r, tx, ty + r, 0.55, tc);
+      }
+      this.arc(fx, fy + 24, 52, 202, 338, 3, '#403650');
+      for (const s2 of [-1, 1]) {
+        const hx = fx + s2 * 50;
+        this.box(hx, fy, 7, 12, 5, '#e85c68'); this.box(hx - s2 * 5, fy, 2.5, 9, 2, '#963c52');
+        this.line(hx + s2 * 2.5, fy - 8, hx + s2 * 2.5, fy - 4, 0.7, '#ffbec4');
+        for (let w = 0; w < 2; w++) {
+          const wx = hx + s2 * (10 + w * 4), h = 3 + w * 2 + 2 * bass, wc = mix(bg, '#e85c68', Math.min(1, (150 + 100 * bass) / 256));
+          this.line(wx, fy - h, wx + s2 * 1.8, fy, 0.6, wc); this.line(wx + s2 * 1.8, fy, wx, fy + h, 0.6, wc);
+        }
+      }
+      for (const s2 of [-1, 1]) {
+        const x = fx + s2 * 21;
+        this.line(x - 8, fy + 3, x, fy - 5, 1.7, K); this.line(x, fy - 5, x + 8, fy + 3, 1.7, K);
+        this.box(fx + s2 * 31, fy + 9, 5, 2.5, 2.5, '#ffaa8c');
+      }
+      this.circle(fx, fy + 6, 1.4, '#6e3c3c');
+      const mo = 1 + 1.5 * bass;
+      this.line(fx - 5, fy + 9, fx - 2.5, fy + 9 + mo, 0.7, K); this.line(fx - 2.5, fy + 9 + mo, fx, fy + 9, 0.7, K);
+      this.line(fx, fy + 9, fx + 2.5, fy + 9 + mo, 0.7, K); this.line(fx + 2.5, fy + 9 + mo, fx + 5, fy + 9, 0.7, K);
+      const EQ = ['#50d2e6', '#3c78f0', '#965ae6', '#dc50c8', '#eb4646', '#f59632', '#f0d73c', '#5acd5a', '#46c8a0'];
+      for (let i = 0; i < 9; i++) { const h = 2 + Math.round((2 + Math.abs(Math.sin(t * (5 + i) + i)) * 9) * 1.1); this.line(56 + i * 6, 77, 56 + i * 6, 77 - h, 1.9, EQ[i]); }
+      const vx = 146, vy = 66, ang = t * (3 + 6 * bass);
+      this.circle(vx, vy, 9, '#1e1e26'); this.circle(vx, vy, 6.6, '#343440');
+      this.line(vx + Math.cos(ang) * 4, vy + Math.sin(ang) * 4, vx + Math.cos(ang) * 8, vy + Math.sin(ang) * 8, 0.6, '#9696aa');
+      this.circle(vx, vy, 3.4, hue(t * 0.05)); this.circle(vx, vy, 0.8, '#1e1e26');
+      for (let i = 0; i < 2; i++) {
+        const p = (t * 0.22 + i * 0.5) % 1, nx = 14 + 5 * Math.sin(t * 2 + i * 1.7), ny = 76 - p * 60, nc = hue(0.3 + i * 0.4 + p * 0.2);
+        this.circle(nx, ny, 2.4, nc); this.line(nx + 2, ny, nx + 2, ny - 7, 0.7, nc); this.line(nx + 2, ny - 7, nx + 5, ny - 5, 0.7, nc);
       }
       return;
     }

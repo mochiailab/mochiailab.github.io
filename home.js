@@ -103,7 +103,7 @@ if (window.MochiSite) window.MochiSite.addCommands([
 ]);
 
 const key = ML.savedCode();
-if (ML.KEY_RE.test(key)) { connect(key); render(); }
+if (document.documentElement.dataset.key === '1' && ML.KEY_RE.test(key)) { connect(key); render(); }  // (data-key: a key AND developer mode)
 else showcase();
 
 // No key on this browser: the page is a showcase (the .intro parts, see theme.js). The mirror plays

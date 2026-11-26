@@ -18,13 +18,16 @@
   else if (location.hash === '#nap') location.replace('cai-dat.html#nap');
   // the QR code on Mochi's screen (menu > Code web): https://mochiailab.github.io/#<key>
   // (after '#', so the key never reaches the server); Cài đặt fills it in and connects
-  else if (/^#[A-Za-z0-9]{12}$/.test(location.hash)) location.replace('cai-dat.html' + location.hash);
+  else if (/^#[A-Za-z0-9]{12}$/.test(location.hash)) {  // (only in developer mode: 7 taps on the footer)
+    let dev = false; try { dev = localStorage.getItem('mochiDev') === '1'; } catch (e) {}
+    if (dev) location.replace('cai-dat.html' + location.hash); else history.replaceState(null, '', location.pathname);
+  }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="theme.js?v=20261270"></script>
-<link rel="stylesheet" href="site.css?v=20261270">
+<link rel="stylesheet" href="site.css?v=20261280">
 <link rel="stylesheet" href="glass.css?v=20261270">
 <link rel="stylesheet" href="home.css?v=20261270">
 </head>
@@ -36,11 +39,14 @@
     <div>
       <span class="greet" id="greet">👋 Xin chào</span>
       <h1>Bạn nhỏ <em>Mochi</em> trên bàn làm việc</h1>
-      <p class="lead">Nuôi Mochi, nhắn chữ, đổi màu, xem giờ và thời tiết, cập nhật qua Wi-Fi. Tất cả từ điện thoại, mã hoá đầu-cuối.</p>
+      <p class="lead devonly">Nuôi Mochi, nhắn chữ, đổi màu, xem giờ và thời tiết, cập nhật qua Wi-Fi. Tất cả từ điện thoại, mã hoá đầu-cuối.</p>
+      <p class="lead publiconly">Xem Mochi hoạt động, nạp firmware ngay trên trình duyệt và đấu dây theo sơ đồ ảnh linh kiện thật.</p>
       <div class="btns">
         <a class="btn primary needkey" href="tinh-nang.html">🐣 Điều khiển Mochi</a>
-        <a class="btn primary intro" href="cai-dat.html#ma">🔑 Kết nối Mochi của bạn</a>
-        <a class="btn" href="cai-dat.html#nap">⚡ Nạp firmware <small>(trong Cài đặt)</small></a>
+        <a class="btn primary intro devonly" href="cai-dat.html#ma">🔑 Kết nối Mochi của bạn</a>
+        <a class="btn devonly" href="cai-dat.html#nap">⚡ Nạp firmware <small>(trong Cài đặt)</small></a>
+        <a class="btn primary publiconly" href="cai-dat.html#nap">⚡ Nạp firmware cho Mochi</a>
+        <a class="btn publiconly" href="esp32-c3.html#daydien">🔌 Sơ đồ đấu dây</a>
       </div>
     </div>
     <div class="screen"><canvas id="live" aria-label="Màn hình Mochi trực tiếp"></canvas><span class="live-tag" id="liveTag">Mô phỏng</span></div>
@@ -73,13 +79,13 @@
     </div>
   </div>
   <!-- without a key (theme.js: html[data-key="0"]) the home page is a showcase -->
-  <div class="label intro">Mochi làm được gì</div>
-  <div class="feats intro">
+  <div class="label intro devonly">Mochi làm được gì</div>
+  <div class="feats intro devonly">
     <div class="card feat"><span class="ic">🎨</span><div><b>Giao diện</b><small>6 màu thân, độ sáng, 10 kiểu đồng hồ (lịch âm, bầu trời, trà sữa, theo mùa…), thời tiết nơi bạn ở, giờ đi ngủ.</small></div></div>
     <div class="card feat"><span class="ic">✨</span><div><b>Tính năng</b><small>Trò chuyện bằng giọng nói, nhắn chữ lên màn, nuôi Mochi (cho ăn, thả tim), lời nhắc & báo thức, Pomodoro, mở nhạc.</small></div></div>
-    <div class="card feat"><span class="ic">📱</span><div><b>Điều khiển qua điện thoại</b><small>Quét mã QR trên Mochi là điều khiển được qua Wi-Fi, xem màn Mochi trực tiếp, cập nhật firmware. Mã hoá đầu-cuối.</small></div></div>
+    <div class="card feat devonly"><span class="ic">📱</span><div><b>Điều khiển qua điện thoại</b><small>Quét mã QR trên Mochi là điều khiển được qua Wi-Fi, xem màn Mochi trực tiếp, cập nhật firmware. Mã hoá đầu-cuối.</small></div></div>
   </div>
-  <div class="card nokey intro" id="nokey">
+  <div class="card nokey intro devonly" id="nokey">
     <h2 style="justify-content:center">🔑 Kết nối Mochi của bạn</h2>
     <p class="lead" style="margin:0 auto 14px">Trên Mochi: giữ nút chạm 2 giây, chạm tới mục <b>Code web</b> rồi quét mã QR bằng camera điện thoại. Hoặc nhập mã 12 ký tự ở trang Cài đặt. Nhập mã xong, trang này thành bảng điều khiển Mochi của bạn.</p>
     <a class="btn primary" href="cai-dat.html#ma">Nhập mã của Mochi</a>
@@ -96,7 +102,7 @@
 </main>
 <div class="toast" id="toast"></div>
 <footer></footer>
-<script src="site.js?v=20261300"></script>
+<script src="site.js?v=20261280"></script>
 <script src="stats.js?v=20261290"></script>
 <script src="mochi-link.js?v=20261280"></script>
 <script src="mochi-screen.js?v=20261260"></script>

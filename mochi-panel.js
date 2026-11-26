@@ -93,9 +93,18 @@ function render() {
   document.querySelectorAll('#callLevel button').forEach((b) => b.classList.toggle('on', +b.dataset.v === call));
   const t = state.timer;
   $('timerLeft').textContent = t > 0 ? 'Còn ' + Math.floor(t / 60) + ' phút ' + String(t % 60).padStart(2, '0') + ' giây' : 'Không có hẹn giờ';
-  $('info').textContent = 'Mạch ' + BOARD_NAMES[boardOf(state)] + ' · Giờ trên Mochi: ' + state.time + ' · lõi xiaozhi ' + state.fw + (state.sleep ? ' · Đang ngủ' : '');
+  $('info').textContent = 'Mạch ' + BOARD_NAMES[boardOf(state)] + ' · Giờ trên Mochi: ' + state.time + ' · lõi xiaozhi ' + state.fw + (state.sleep ? ' · Đang ngủ' : '') +
+    (state.rr ? ' · Đã chạy ' + upText(state.up) + ', lần bật: ' + resetText(state.rr) : '') +
+    (state.crash ? ' · Sự cố gần nhất: ' + resetText(state.crash.split('|')[0]) + (state.crash.includes('|') ? ' lúc ' + state.crash.split('|')[1] : '') : '');
   renderUpdate();
 }
+
+// why Mochi last started (firmware Board::ResetReasonName), in plain words
+const RESET_VI = { 'power-on': 'bật nguồn', 'software restart': 'khởi động lại theo lệnh', 'panic or exception': 'lỗi phần mềm',
+  'interrupt watchdog': 'bị treo', 'task watchdog': 'bị treo', 'other watchdog': 'bị treo', brownout: 'sụt nguồn / pin yếu',
+  'power glitch': 'chập nguồn', 'CPU lockup': 'bị treo', 'USB peripheral': 'cắm lại USB', 'external pin': 'nút reset' };
+function resetText(r) { return RESET_VI[r] || r; }
+function upText(s) { s = s || 0; return s < 3600 ? Math.round(s / 60) + ' phút' : s < 172800 ? Math.floor(s / 3600) + ' giờ' : Math.floor(s / 86400) + ' ngày'; }
 
 // ---------- "Nuôi Mochi" (firmware: mochi_pet.h, state.pet) ----------
 const MOODS = [['🙂', 'Mochi đang ổn'], ['🥺', 'Mochi đang đói'], ['😪', 'Mochi mệt rồi'],
@@ -471,9 +480,18 @@ $('forget').addEventListener('click', () => {
 });
 $('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
 window.MochiLink.keyInput($('code'));
+// "Tắt chế độ nhà phát triển": back to the public site (the saved key stays, unused, until dev mode again)
+$('devOff').addEventListener('click', () => {
+  if (window.MochiTheme) window.MochiTheme.setDev(false);
+  location.href = './';
+});
+// Without developer mode (7 taps on the footer) the page is only the flasher: no link at all.
+const DEV = !window.MochiTheme || !window.MochiTheme.isDev || window.MochiTheme.isDev();
 // opened from the QR code on Mochi (index.html passes #<key> on): take the key, drop it from the URL
 const fromQr = normKey(location.hash);
-if (KEY_RE.test(fromQr) && location.hash.length === 13) {
+if (!DEV) {
+  if (location.hash.length === 13) history.replaceState(null, '', location.pathname);
+} else if (KEY_RE.test(fromQr) && location.hash.length === 13) {
   history.replaceState(null, '', location.pathname);
   $('code').value = prettyKey(fromQr);
   connect();

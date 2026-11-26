@@ -46,7 +46,17 @@
     try { return KEY_RE.test(sessionStorage.getItem('mochiKey') || '') || KEY_RE.test(localStorage.getItem('mochiKey') || ''); }
     catch (e) { return false; }
   }
-  function markKey() { const k = hasKey(); document.documentElement.dataset.key = k ? '1' : '0'; return k; }
+  // Developer mode (localStorage mochiDev = 1), opened by tapping the footer 7 times (site.js),
+  // like Android's "build number": until then the site shows only Mochi, the wiring and the
+  // firmware flasher, and no key box. It only hides the controls (the key and its encryption
+  // are what protect a Mochi), so people who are not told about it don't find the key box.
+  function isDev() { try { return localStorage.getItem('mochiDev') === '1'; } catch (e) { return false; } }
+  function markKey() {
+    const dev = isDev(), k = dev && hasKey();
+    document.documentElement.dataset.dev = dev ? '1' : '0';
+    document.documentElement.dataset.key = k ? '1' : '0';
+    return k;
+  }
   if (!markKey() && document.documentElement.hasAttribute('data-needkey')) location.replace('./');
   window.MochiTheme = {
     ACCENTS, get: () => Object.assign({}, t),
@@ -55,5 +65,7 @@
     body(i) { if (String(i) !== get('mochiBody', '')) { put('mochiBody', i); apply(); } },
     // re-read the key after it was saved / forgotten (site.js MochiSite.keyChanged); true = has one
     markKey,
+    isDev,
+    setDev(on) { try { if (on) localStorage.setItem('mochiDev', '1'); else localStorage.removeItem('mochiDev'); } catch (e) {} return markKey(); },
   };
 })();

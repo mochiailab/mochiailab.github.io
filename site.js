@@ -20,6 +20,9 @@
   // has a Mochi key (theme.js markKey: html[data-key])
   const T0 = window.MochiTheme;
   let hasKey = document.documentElement.dataset.key === '1';
+  let isDev = document.documentElement.dataset.dev === '1';
+  // for the public (no developer mode) the settings item is just the firmware flasher
+  if (!isDev) Object.assign(MENU.find((m) => m.id === 'settings'), { text: 'Nạp firmware', icon: '⚡', href: 'cai-dat.html#nap' });
   // the owner's devices: the GoatCounter secret link saved on thong-ke.html (mochiOwner); items
   // with owner: true (and palette commands of the 'Chủ' group) only show there
   const ownerNow = () => { try { return !!localStorage.getItem('mochiOwner'); } catch (e) { return false; } };
@@ -164,6 +167,18 @@
   const footer = document.querySelector('footer');
   if (footer) {
     footer.innerHTML = '© ' + new Date().getFullYear() + ' <b>Nguyễn Nam</b> · Mochi AI Lab';
+    // developer mode: tap the footer 7 times in a row (silently: no countdown, no message;
+    // the page just opens the key box on Cài đặt)
+    let taps = 0, last = 0;
+    footer.addEventListener('click', () => {
+      const now = Date.now();
+      taps = now - last < 1200 ? taps + 1 : 1;
+      last = now;
+      if (isDev || taps < 7) return;
+      taps = 0;
+      T0 && T0.setDev(true);
+      location.href = 'cai-dat.html#ma';
+    });
   }
 
   window.MochiSite = {
