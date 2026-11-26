@@ -200,7 +200,7 @@ const BODY_COLORS = [
   { name: 'Tím', hex: '#d6c6f6' }, { name: 'Trắng', hex: '#eeeeee' }, { name: 'Đen', hex: '#000000', dark: true },
 ];
 window.MochiLink = {
-  Link, OldLink, KEY_RE, OLD_CODE_RE, normKey, prettyKey, BODY_COLORS,
+  Link, OldLink, Mqtt, BROKER, KEY_RE, OLD_CODE_RE, normKey, prettyKey, BODY_COLORS,
   savedCode() { return getItem(store(false), KEY) || getItem(store(true), KEY) || getItem(store(true), OLD_KEY); },
   saveCode(code) {
     const box = document.getElementById('remember');
@@ -211,6 +211,12 @@ window.MochiLink = {
       else { sessionStorage.setItem(KEY, code); localStorage.removeItem(KEY); }
       localStorage.removeItem(OLD_KEY);
     } catch (e) {}
+    if (window.MochiSite && window.MochiSite.keyChanged) window.MochiSite.keyChanged();
+  },
+  // "Quên mã trên máy này": the site goes back to the showcase (no key)
+  forgetCode() {
+    try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); localStorage.removeItem(OLD_KEY); } catch (e) {}
+    if (window.MochiSite && window.MochiSite.keyChanged) window.MochiSite.keyChanged();
   },
   // the "remember" checkbox: ticked unless the key lives only in this tab; unticking forgets it
   rememberBox() {

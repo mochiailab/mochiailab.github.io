@@ -82,6 +82,8 @@ header {
 .tag.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
 .tag.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
 .hidden { display: none !important; }
+/* without a Mochi key the site is a showcase (theme.js sets html[data-key]) */
+[data-key="0"] .needkey, [data-key="1"] .intro { display: none !important; }
 /* ---------- cards (home page, nap-firmware.html; filled by cards.js) ---------- */
 section { margin-top: 30px; scroll-margin-top: 120px; }
 section > h2 { margin: 0 0 4px; font-size: 22px; letter-spacing: -.3px; }
@@ -114,5 +116,7 @@ footer a { color: inherit; }
 .remember { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin: 10px 2px 0; font-size: 14px; color: var(--text); cursor: pointer; }
 .remember input { accent-color: var(--accent); }
 .remember small { color: var(--muted); }
+.forget { margin: 10px 2px 0; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 0;
+  padding: 0; text-decoration: underline; cursor: pointer; }
 
 [hidden] { display: none !important; }

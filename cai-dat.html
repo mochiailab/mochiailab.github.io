@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084 https://geocoding-api.open-meteo.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://mochiailab.goatcounter.com; connect-src 'self' wss://broker.emqx.io:8084 https://geocoding-api.open-meteo.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cài đặt Mochi · Mochi AI Lab</title>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -14,17 +14,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="theme.js?v=20261140"></script>
-<link rel="stylesheet" href="site.css?v=20261140">
-<link rel="stylesheet" href="glass.css?v=20261161">
-<link rel="stylesheet" href="mochi-panel.css?v=20261151">
+<script src="theme.js?v=20261270"></script>
+<link rel="stylesheet" href="site.css?v=20261270">
+<link rel="stylesheet" href="glass.css?v=20261270">
+<link rel="stylesheet" href="mochi-panel.css?v=20261260">
 </head>
 <body>
 <header data-active="settings"></header>
 
 <main>
   <h1>Cài đặt <b>Mochi</b></h1>
-  <p class="lead">Mã của Mochi, âm lượng, cập nhật, Wi-Fi, khởi động lại và nạp firmware. Màu, đồng hồ, thời tiết ở trang <a href="giao-dien.html">Giao diện</a>; nhắn chữ, nuôi Mochi, lời nhắc ở trang <a href="tinh-nang.html">Tính năng</a>.</p>
+  <p class="lead needkey">Mã của Mochi, âm lượng, cập nhật, Wi-Fi, khởi động lại và nạp firmware. Màu, đồng hồ, thời tiết ở trang <a href="giao-dien.html">Giao diện</a>; nhắn chữ, nuôi Mochi, lời nhắc ở trang <a href="tinh-nang.html">Tính năng</a>.</p>
+  <p class="lead intro">Nhập mã của Mochi để điều khiển Mochi qua điện thoại, hoặc nạp firmware cho Mochi mới ở cuối trang. Nhập mã xong, các trang Giao diện và Tính năng hiện ra trên menu.</p>
 
   <div class="card" id="ma">
     <h2><span>🔑</span>Mã của Mochi</h2>
@@ -34,6 +35,7 @@
       <button class="primary" id="btnConnect">Kết nối</button>
     </div>
     <label class="remember"><input type="checkbox" id="remember" checked> Ghi nhớ mã trên máy này <small>(bỏ chọn khi dùng máy người khác: mã mất khi đóng tab)</small></label>
+    <button class="needkey forget" id="forget" type="button">Quên mã trên máy này</button>
     <div class="status" id="status"><i></i><div><b id="stTitle">Chưa kết nối</b><small id="stSub">Giữ nút chạm 2 giây, chạm tới mục Code web rồi <b>quét mã QR</b> trên màn Mochi bằng camera điện thoại (<a href="#doi-ma">hướng dẫn</a>)</small></div></div>
   </div>
 
@@ -43,7 +45,7 @@
     <div class="row"><span class="grow" id="oldFwInfo">Đang chờ Mochi…</span><button class="primary" id="oldFwBtn" disabled>⬆ Cập nhật lên bản mã hoá</button></div>
   </div>
 
-  <fieldset id="controls" disabled>
+  <fieldset id="controls" class="needkey" disabled>
   <div class="card">
     <h2><span>🔊</span>Âm thanh</h2>
     <div class="row"><span class="lbl grow">Âm lượng</span><span class="big" id="volVal">–</span></div>
@@ -89,9 +91,10 @@
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261161"></script>
-<script src="mochi-link.js?v=20261160"></script>
-<script src="mochi-panel.js?v=20261161"></script>
-<script src="cards.js?v=20261150"></script>
+<script src="site.js?v=20261270"></script>
+<script src="stats.js?v=20261290"></script>
+<script src="mochi-link.js?v=20261280"></script>
+<script src="mochi-panel.js?v=20261270"></script>
+<script src="cards.js?v=20261260"></script>
 </body>
 </html>

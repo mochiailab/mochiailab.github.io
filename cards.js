@@ -13,9 +13,9 @@
       ],
     },
     {
-      icon: 'S3', title: 'ESP32-S3 N16R8', status: 'soon', sub: '16 MB flash · 8 MB PSRAM',
-      text: 'Sơ đồ đấu dây dự kiến. Firmware đang chuẩn bị.',
-      href: 'esp32-s3.html', go: 'Xem sơ đồ ›',
+      icon: 'S3', title: 'ESP32-S3 + ST7789 1.69"', status: 'soon', sub: 'N16R8 · 16 MB flash · 8 MB PSRAM',
+      text: 'Màn 240×280 đặt dọc, mặt Mochi to hơn. Sơ đồ đấu dây và giao diện xem trước. Firmware đang chuẩn bị.',
+      href: 'esp32-s3.html', go: 'Xem sơ đồ & giao diện ›',
     },
   ];
   const FEATURES = [

@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="vi">
+<html lang="vi" data-needkey>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084 https://geocoding-api.open-meteo.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://mochiailab.goatcounter.com; connect-src 'self' wss://broker.emqx.io:8084 https://geocoding-api.open-meteo.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Giao diện Mochi · Mochi AI Lab</title>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -14,10 +14,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="theme.js?v=20261140"></script>
-<link rel="stylesheet" href="site.css?v=20261140">
-<link rel="stylesheet" href="glass.css?v=20261161">
-<link rel="stylesheet" href="mochi-panel.css?v=20261151">
+<script src="theme.js?v=20261270"></script>
+<link rel="stylesheet" href="site.css?v=20261270">
+<link rel="stylesheet" href="glass.css?v=20261270">
+<link rel="stylesheet" href="mochi-panel.css?v=20261260">
 </head>
 <body>
 <header data-active="look"></header>
@@ -42,12 +42,7 @@
     </div>
     <div class="row"><button class="grow" data-cmd="clock_show">Xem giờ nhanh (8 giây)</button></div>
     <p class="lbl" style="margin:14px 0 8px">Kiểu đồng hồ</p>
-    <div class="faces" id="faces">
-      <button data-v="0"><span class="face seg7">12:34</span>Số 7 đoạn</button>
-      <button data-v="1"><span class="face analog"><i></i><i></i></span>Kim đồng hồ</button>
-      <button data-v="2"><span class="face big">12:34<small>Thứ Hai, 23/11</small></span>Số to + ngày</button>
-      <button data-v="3"><span class="face wx">☀<b>12:34<small>28° · 19–30°</small></b></span>Giờ + thời tiết</button>
-    </div>
+    <div class="faces" id="faces"></div>
     <p class="lbl" style="margin:14px 0 8px">Màu nền đồng hồ</p>
     <div class="bgs" id="clockBg"></div>
   </div>
@@ -91,8 +86,10 @@
 <footer></footer>
 <div class="toast" id="toast"></div>
 
-<script src="site.js?v=20261161"></script>
-<script src="mochi-link.js?v=20261160"></script>
-<script src="mochi-panel.js?v=20261161"></script>
+<script src="site.js?v=20261270"></script>
+<script src="stats.js?v=20261290"></script>
+<script src="mochi-link.js?v=20261280"></script>
+<script src="mochi-screen.js?v=20261260"></script>
+<script src="mochi-panel.js?v=20261270"></script>
 </body>
 </html>

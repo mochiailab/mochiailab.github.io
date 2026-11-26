@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mochi ESP32-S3 · Mochi AI Lab</title>
+<title>Mochi ESP32-S3 + ST7789 1.69" · Mochi AI Lab</title>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="manifest" href="site.webmanifest">
@@ -13,9 +13,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="theme.js?v=20261140"></script>
-<link rel="stylesheet" href="site.css?v=20261140">
-<link rel="stylesheet" href="glass.css?v=20261161">
+<script src="theme.js?v=20261270"></script>
+<link rel="stylesheet" href="site.css?v=20261270">
+<link rel="stylesheet" href="glass.css?v=20261270">
 <style>
 .crumb { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
 .crumb a { color: inherit; }
@@ -38,6 +38,14 @@ td:first-child { font-weight: 600; white-space: nowrap; }
 .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 18px; }
 .note { padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
 .note b { display: block; margin-bottom: 4px; }
+.prevhead { font-size: 17px; margin: 22px 0 10px; }
+.phone { width: min(100%, 250px); margin: 0 auto; padding: 12px; border-radius: 50px; background: rgba(10, 8, 16, .88);
+  box-shadow: 0 16px 40px rgba(40, 20, 70, .25), 0 0 0 1px var(--line); }
+.phone canvas { display: block; width: 100%; aspect-ratio: 240 / 280; border-radius: 38px; background: #000; }
+.demo { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 14px; }
+.demo button { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--surface-solid); color: var(--muted);
+  padding: 6px 12px; border-radius: 99px; cursor: pointer; }
+.demo button.on { background: var(--accent); color: var(--accent-text); border-color: transparent; }
 @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -49,7 +57,7 @@ td:first-child { font-weight: 600; white-space: nowrap; }
     <div>
       <p class="crumb"><a href="./">Trang chủ</a> › <a href="cai-dat.html">Cài đặt</a> › <a href="cai-dat.html#nap">Nạp firmware</a> › ESP32-S3</p>
       <h1>Mochi <b>ESP32-S3</b> N16R8 <span class="tag warn">Sắp có</span></h1>
-      <p>16 MB flash · 8 MB PSRAM. Sơ đồ đấu dây dự kiến, firmware đang chuẩn bị.</p>
+      <p>16 MB flash · 8 MB PSRAM · màn ST7789 1.69" 240×280 đặt dọc. Sơ đồ đấu dây dự kiến, firmware đang chuẩn bị.</p>
     </div>
   </div>
 
@@ -57,6 +65,13 @@ td:first-child { font-weight: 600; white-space: nowrap; }
     <aside class="panel">
       <button class="btn" disabled>⚡ Nạp Mochi AI</button>
       <p class="hint">Chưa có firmware cho S3. Khi có mạch, gửi ảnh hoặc tên mạch để build và thêm vào đây.</p>
+      <h2 class="prevhead">Giao diện trên màn 1.69"</h2>
+      <div class="phone"><canvas id="s3prev" aria-label="Xem trước màn hình Mochi ESP32-S3"></canvas></div>
+      <div class="demo" id="s3demo" role="tablist">
+        <button data-i="0" class="on">Mặt Mochi</button><button data-i="1">Đang nói</button>
+        <button data-i="2">Đồng hồ</button><button data-i="3">Thời tiết</button><button data-i="4">Chữ màu</button>
+      </div>
+      <p class="hint">Bản xem trước, vẽ bằng cùng mã với trang chủ. Mặt Mochi to gấp 1,5 lần bản C3, phụ đề hiện trong bong bóng bên dưới, đồng hồ có thêm ô ngày, âm lịch, thời tiết và lời nhắc.</p>
     </aside>
 
     <main class="panel" style="min-width:0">
@@ -114,9 +129,9 @@ td:first-child { font-weight: 600; white-space: nowrap; }
   <text x="760" y="136" font-size="12" fill="var(--gnd)" font-weight="600">GND ➜ GND</text>
   <circle cx="648" cy="110" r="5" fill="var(--text)"/>
   <rect x="648" y="166" width="222" height="336" rx="12" fill="var(--module)" stroke="var(--module-stroke)"/>
-  <text x="664" y="190" font-weight="700" fill="var(--text)">ST7735S 0.96" 80×160</text>
+  <text x="664" y="190" font-weight="700" fill="var(--text)">ST7789 1.69" 240×280</text>
   <g fill="var(--text)" font-weight="600"><text x="664" y="214">CS</text><text x="664" y="254">DC</text><text x="664" y="294">RES</text><text x="664" y="334">SDA</text><text x="664" y="374">SCL</text><text x="664" y="414">BLK</text></g>
-  <g fill="var(--muted)" font-size="12"><text x="712" y="414">đèn nền (tắt được)</text></g>
+  <g fill="var(--muted)" font-size="12"><text x="712" y="414">đèn nền, chỉnh sáng</text></g>
   <g font-size="12.5"><text x="664" y="452" fill="var(--p33)" font-weight="600">VCC ➜ 3V3</text><text x="664" y="474" fill="var(--gnd)" font-weight="600">GND ➜ GND</text></g>
   <g fill="var(--text)"><circle cx="648" cy="210" r="5"/><circle cx="648" cy="250" r="5"/><circle cx="648" cy="290" r="5"/><circle cx="648" cy="330" r="5"/><circle cx="648" cy="370" r="5"/><circle cx="648" cy="410" r="5"/></g>
 </svg>
@@ -124,7 +139,7 @@ td:first-child { font-weight: 600; white-space: nowrap; }
       <div class="tablewrap hidden" data-pane="table">
 <table>
             <tr><th>Linh kiện</th><th>Tín hiệu</th><th>Nguồn</th></tr>
-            <tr><td>Màn ST7735S</td><td>CS→41 · DC→40 · RES→45 · SDA→47 · SCL→21 · BLK→42</td><td>VCC→3V3 · GND</td></tr>
+            <tr><td>Màn ST7789 1.69"</td><td>CS→41 · DC→40 · RES→45 · SDA→47 · SCL→21 · BLK→42</td><td>VCC→3V3 · GND</td></tr>
             <tr><td>Mic INMP441</td><td>SD→6 · WS→4 · SCK→5</td><td>VDD→3V3 · GND · L/R→GND</td></tr>
             <tr><td>Ampli MAX98357A</td><td>DIN→7 · BCLK→15 · LRC→16</td><td>VIN→5V · GND · loa ở + / −</td></tr>
             <tr><td>Nút chạm TTP223</td><td>I/O→2</td><td>VCC→3V3 · GND</td></tr>
@@ -133,18 +148,16 @@ td:first-child { font-weight: 600; white-space: nowrap; }
       <div class="notes">
         <div class="note"><b>Dây riêng</b>Trên S3, mic và ampli đi dây riêng, không chung chân như C3.</div>
         <div class="note"><b>Tránh GPIO 35–37</b>Trên mạch N16R8, ba chân này đã nối với PSRAM.</div>
+        <div class="note"><b>Màn 1.69" có 8 chân</b>GND · VCC · SCL · SDA · RES · DC · CS · BLK. SCL / SDA ở đây là SPI (không phải I2C). BLK nối GPIO 42 để Mochi chỉnh độ sáng đèn nền thật.</div>
         <div class="note"><b>Dò số trên mạch</b>Thứ tự chân trong hình có thể khác mạch thật. Luôn đối chiếu số in trên mạch.</div>
       </div>
     </main>
   </div>
 </div>
 <footer></footer>
-<script src="site.js?v=20261161"></script>
-<script>
-document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.seg button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
-  document.querySelectorAll('[data-pane]').forEach(p => p.classList.toggle('hidden', p.dataset.pane !== b.dataset.view));
-}));
-</script>
+<script src="site.js?v=20261270"></script>
+<script src="stats.js?v=20261290"></script>
+<script src="mochi-screen.js?v=20261260"></script>
+<script src="esp32-s3.js?v=20261260"></script>
 </body>
 </html>

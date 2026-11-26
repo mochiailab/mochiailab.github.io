@@ -5,7 +5,7 @@
 (function () {
 const { Link, OldLink, KEY_RE, OLD_CODE_RE, normKey, prettyKey } = window.MochiLink;
 // clock backgrounds, same order as kClockBgs in mochi_display.h (0 = Mochi's own colour)
-const CLOCK_BGS = [['Theo màu Mochi', ''], ['Đen', '#000000'], ['Xanh trời', '#c4e2fc', 1], ['Tím nhạt', '#ded0fc', 1],
+const CLOCK_BGS = [['Màu theo mẫu', ''], ['Đen', '#000000'], ['Xanh trời', '#c4e2fc', 1], ['Tím nhạt', '#ded0fc', 1],
   ['Bạc hà', '#c6f2d8', 1], ['Cam đào', '#ffd8c8', 1], ['Vàng chanh', '#fcf0aa', 1], ['Hồng phấn', '#ffd2e4', 1],
   ['Kem', '#faeed6', 1], ['Trắng', '#f4f4f4', 1]];
 const COLORS = window.MochiLink.BODY_COLORS.map((c) => [c.name, c.dark ? '#111111' : c.hex]);
@@ -72,15 +72,9 @@ function renderWeather() {
 function render() {
   if (!state) return;
   document.querySelectorAll('#faces button').forEach((b) => b.classList.toggle('on', +b.dataset.v === (state.cstyle || 0)));
-  document.querySelectorAll('#clockBg button').forEach((b) => b.classList.toggle('on', +b.dataset.v === (state.cbg || 0)));
-  // clock previews in the chosen background
-  const bg = CLOCK_BGS[state.cbg || 0] || CLOCK_BGS[0];
-  const bodyHex = (window.MochiLink.BODY_COLORS[state.color] || {}).hex;
-  const light = bg[1] ? !!bg[2] : !(window.MochiLink.BODY_COLORS[state.color] || {}).dark;
-  document.querySelectorAll('.face').forEach((f) => {
-    f.style.background = bg[1] || bodyHex || '#0b0b10';
-    f.style.color = light ? '#2c2838' : '#fff';
-  });
+  // (black is no longer offered: the clock faces keep their own colours on it, as with 0)
+  document.querySelectorAll('#clockBg button').forEach((b) => b.classList.toggle('on', +b.dataset.v === (state.cbg > 1 ? state.cbg : 0)));
+  drawFacePreviews();
   renderWeather();
   document.querySelectorAll('#colors button').forEach((b) => b.classList.toggle('on', +b.dataset.v === state.color));
   $('clock').checked = state.clock === 1;
@@ -99,7 +93,7 @@ function render() {
   document.querySelectorAll('#callLevel button').forEach((b) => b.classList.toggle('on', +b.dataset.v === call));
   const t = state.timer;
   $('timerLeft').textContent = t > 0 ? 'Còn ' + Math.floor(t / 60) + ' phút ' + String(t % 60).padStart(2, '0') + ' giây' : 'Không có hẹn giờ';
-  $('info').textContent = 'Giờ trên Mochi: ' + state.time + ' · lõi xiaozhi ' + state.fw + (state.sleep ? ' · Đang ngủ' : '');
+  $('info').textContent = 'Mạch ' + BOARD_NAMES[boardOf(state)] + ' · Giờ trên Mochi: ' + state.time + ' · lõi xiaozhi ' + state.fw + (state.sleep ? ' · Đang ngủ' : '');
   renderUpdate();
 }
 
@@ -343,9 +337,18 @@ $('wifi').addEventListener('click', () => {
   if (send('wifi')) toast('Mochi đang vào chế độ cài Wi-Fi');
 });
 // ---------- firmware update over Wi-Fi ----------
-// the latest version is the one the web flasher serves (firmware/manifest-c3.json)
-let latest = null, updating = null, updStart = 0;
-fetch('manifest-c3.json', { cache: 'no-store' }).then((r) => r.json()).then((m) => { latest = m.version; renderUpdate(); }).catch(() => {});
+// the latest version is the one the web flasher serves for this Mochi's board: manifest-<hw>.json
+// (state.hw "c3" / "s3"; firmware without it is a C3). Fetched again when the board changes.
+const BOARD_NAMES = { c3: 'ESP32-C3 · màn 0.96"', s3: 'ESP32-S3 · màn 1.69"' };
+let latest = null, latestHw = null, updating = null, updStart = 0;
+const boardOf = (st) => (st && BOARD_NAMES[st.hw] ? st.hw : 'c3');
+function loadLatest(hw) {
+  if (latestHw === hw) return;
+  latestHw = hw; latest = null;
+  fetch('manifest-' + hw + '.json', { cache: 'no-store' }).then((r) => r.json())
+    .then((m) => { if (latestHw === hw) { latest = m.version; renderUpdate(); } }).catch(() => {});
+}
+loadLatest('c3');
 // "2026.11.24-7" -> compares as numbers part by part (an empty / old version is the oldest)
 function cmpVersion(a, b) {
   const p = (v) => String(v || '').split(/[.-]/).map((x) => parseInt(x, 10) || 0);
@@ -355,6 +358,7 @@ function cmpVersion(a, b) {
 }
 function renderUpdate() {
   if (!state) return;
+  loadLatest(boardOf(state));
   const cur = state.mfw || '';
   $('updTitle').textContent = 'Phiên bản Mochi: ' + (cur || 'cũ (chưa ghi phiên bản)');
   // done = Mochi restarted after we asked (it reports its uptime), or reports a new version
@@ -365,7 +369,7 @@ function renderUpdate() {
   }
   let sub, can = false;
   if (updating) sub = 'Mochi đang tải bản mới, màn hiện thanh tiến độ. Khoảng 1–2 phút, đừng rút điện.';
-  else if (!latest) sub = 'Không đọc được bản mới nhất trên web.';
+  else if (!latest) sub = boardOf(state) === 's3' ? 'Chưa có bản cập nhật cho Mochi ESP32-S3 trên web.' : 'Không đọc được bản mới nhất trên web.';
   else if (cmpVersion(cur, latest) >= 0) sub = cur === latest ? '✓ Đang là bản mới nhất' : '✓ Mới hơn bản trên web (' + latest + ')';
   else if (!state.updater) sub = 'Có bản mới ' + latest + ', nhưng Mochi này chưa có bộ cập nhật qua Wi-Fi: nạp lại bằng cáp USB một lần ở trang Nạp firmware.';
   else { sub = '🎉 Có bản mới: ' + latest; can = true; }
@@ -389,12 +393,33 @@ $('reboot').addEventListener('click', () => {
   if (send('reboot')) toast('Mochi đang khởi động lại');
 });
 
-$('clockBg').innerHTML = CLOCK_BGS.map(([n, c], i) =>
+$('clockBg').innerHTML = CLOCK_BGS.map(([n, c], i) => i === 1 ? '' :
   `<button data-v="${i}"><i class="${c ? '' : 'mochi'}" style="${c ? 'background:' + c : ''}"></i>${n}</button>`).join('');
 $('clockBg').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return;
   if (send('clock_bg', { v: +b.dataset.v })) toast('Nền đồng hồ: ' + CLOCK_BGS[+b.dataset.v][0] + ' (Mochi hiện thử 8 giây)');
 });
+// clock faces: same order as the firmware's clock_style (MochiDisplay::kClockStyles); each button
+// shows the face itself, drawn by mochi-screen.js in Mochi's colour, with the time and weather now
+const FACE_NAMES = ['Mochi ôm giờ', 'Bầu trời', 'Thẻ thông minh', 'Xiên dango', 'Lịch âm', 'Đêm sao',
+  'Mochi trèo số', 'Trà sữa', 'Theo mùa', 'Thời tiết'];
+const facePrev = [];
+if (document.getElementById('faces') && window.MochiScreen) {
+  $('faces').innerHTML = FACE_NAMES.map((n, i) => `<button data-v="${i}"><canvas class="facecv" aria-hidden="true"></canvas>${n}</button>`).join('');
+  document.querySelectorAll('#faces canvas').forEach((cv) => facePrev.push(new MochiScreen(cv, { still: true })));
+  setInterval(drawFacePreviews, 30000);
+}
+function drawFacePreviews() {
+  if (!facePrev.length) return;
+  const now = (Date.now() - new Date().getTimezoneOffset() * 60000) / 1000;  // local time, read as UTC
+  const st = state || {};
+  facePrev.forEach((s, i) => {
+    s.setState(st);
+    s.setScene({ f: 0, b: st.color || 0, s: 0, ck: i, cb: st.cbg || 0, now });
+    s.render();
+  });
+}
+drawFacePreviews();
 $('faces').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return;
   if (send('clock_style', { v: +b.dataset.v })) toast('Kiểu đồng hồ: ' + b.textContent.replace(/^[^A-Za-zÀ-ỹ]+/, '').trim() + ' (Mochi hiện thử 8 giây)');
@@ -431,6 +456,19 @@ $('wxFind').addEventListener('click', findCity);
 $('wxCity').addEventListener('keydown', (e) => { if (e.key === 'Enter') findCity(); });
 
 $('btnConnect').addEventListener('click', () => connect());
+// "Quên mã trên máy này" (Cài đặt): drop the link and the saved key; the site becomes the showcase
+$('forget').addEventListener('click', () => {
+  if (!confirm('Quên mã của Mochi trên máy này? Muốn điều khiển lại thì quét mã QR trên Mochi hoặc nhập mã.')) return;
+  if (mq) mq.close();
+  mq = null; code = ''; online = null; state = null; gotState = false;
+  window.MochiLink.forgetCode();
+  $('code').value = '';
+  $('btnConnect').textContent = 'Kết nối';
+  $('controls').disabled = true;
+  setStatus('', 'Chưa kết nối', 'Giữ nút chạm 2 giây, chạm tới mục Code web rồi quét mã QR trên màn Mochi');
+  if (window.MochiSite) window.MochiSite.status('nokey');
+  toast('Đã quên mã trên máy này');
+});
 $('code').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
 window.MochiLink.keyInput($('code'));
 // opened from the QR code on Mochi (index.html passes #<key> on): take the key, drop it from the URL

@@ -9,12 +9,16 @@
 (function () {
   const MENU = [
     { id: 'home', href: './', text: 'Trang chủ', icon: '🏠' },
-    { id: 'look', href: 'giao-dien.html', text: 'Giao diện', icon: '🎨' },
-    { id: 'features', href: 'tinh-nang.html', text: 'Tính năng', icon: '✨' },
+    { id: 'look', href: 'giao-dien.html', text: 'Giao diện', icon: '🎨', key: true },
+    { id: 'features', href: 'tinh-nang.html', text: 'Tính năng', icon: '✨', key: true },
     { id: 'settings', href: 'cai-dat.html', text: 'Cài đặt', icon: '⚙️' },
   ];
   // pages that live inside a menu item (the firmware pages are part of Cài đặt)
   const PARENT = { firmware: 'settings' };
+  // items with key: true (and palette commands of the 'Mochi' group) only show once this browser
+  // has a Mochi key (theme.js markKey: html[data-key])
+  const T0 = window.MochiTheme;
+  let hasKey = document.documentElement.dataset.key === '1';
   const LOGO = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="10" width="56" height="48" rx="22" fill="#f7b6cb"/>' +
     '<rect x="18" y="26" width="8" height="11" rx="4" fill="#2c2838"/><rect x="38" y="26" width="8" height="11" rx="4" fill="#2c2838"/>' +
     '<circle cx="20" cy="28" r="1.6" fill="#fff"/><circle cx="40" cy="28" r="1.6" fill="#fff"/>' +
@@ -43,7 +47,7 @@
   nav.setAttribute('aria-label', 'Menu');
   for (const item of MENU) {
     const a = el('a', null, item.text);
-    a.href = item.href;
+    a.href = item.href; a.dataset.id = item.id;
     if (item.id === active) { a.classList.add('active'); a.setAttribute('aria-current', 'page'); }
     nav.appendChild(a);
   }
@@ -90,7 +94,8 @@
   // ---------- quick search / commands (Ctrl+K) ----------
   const fold = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
   const COMMANDS = [
-    ...MENU.map((m) => [m.icon, 'Mở trang ' + m.text, 'Trang', () => { location.href = m.href; }]),
+    ...MENU.map((m) => [m.icon, 'Mở trang ' + m.text, m.key ? 'Mochi' : 'Trang', () => { location.href = m.href; }]),
+    ['🔑', 'Nhập mã của Mochi', 'Trang', () => { location.href = 'cai-dat.html#ma'; }],
     ['⚡', 'Nạp firmware cho Mochi mới', 'Trang', () => { location.href = 'cai-dat.html#nap'; }],
     ['☀️', 'Giao diện sáng', 'Màu', () => T && T.set({ mode: 'light' })],
     ['🌙', 'Giao diện tối', 'Màu', () => T && T.set({ mode: 'dark' })],
@@ -103,7 +108,7 @@
   let sel = 0, shown = [];
   function render() {
     const q = fold(input.value.trim());
-    shown = COMMANDS.filter((c) => fold(c[1]).includes(q)).slice(0, 12);
+    shown = COMMANDS.filter((c) => (hasKey || c[2] !== 'Mochi') && fold(c[1]).includes(q)).slice(0, 12);
     sel = Math.min(sel, Math.max(0, shown.length - 1));
     list.innerHTML = shown.map((c, i) => `<li class="${i === sel ? 'sel' : ''}" data-i="${i}">${c[0]} ${c[1]}<small>${c[2]}</small></li>`).join('') ||
       '<li>Không thấy lệnh nào</li>';
@@ -126,27 +131,44 @@
   // ---------- bottom dock (phones) ----------
   const dock = el('nav', 'dock', '<i class="drop" aria-hidden="true"></i>');
   dock.setAttribute('aria-label', 'Menu');
-  MENU.forEach((m, i) => {
+  const drop = dock.querySelector('.drop');
+  const visible = () => MENU.filter((m) => hasKey || !m.key);
+  MENU.forEach((m) => {
     const a = el('a', m.id === active ? 'active' : null, `<span>${m.icon}</span>${m.text}`);
-    a.href = m.href;
-    a.addEventListener('click', () => { dock.querySelector('.drop').style.transform = `translateX(${i * 100}%)`; });
+    a.href = m.href; a.dataset.id = m.id;
+    a.addEventListener('click', () => { drop.style.transform = `translateX(${visible().indexOf(m) * 100}%)`; });
     dock.appendChild(a);
   });
-  const ai = MENU.findIndex((m) => m.id === active);
-  if (ai >= 0) dock.querySelector('.drop').style.transform = `translateX(${ai * 100}%)`;
-  else dock.querySelector('.drop').hidden = true;
   document.body.appendChild(dock);
+  // show / hide the key-only items in the menu and the dock (the dock's columns follow the count)
+  function applyKey() {
+    const shownItems = visible();
+    for (const a of [...nav.children, ...dock.querySelectorAll('a')]) {
+      const m = MENU.find((x) => x.id === a.dataset.id);
+      a.hidden = !shownItems.includes(m);
+    }
+    dock.style.setProperty('--n', shownItems.length);
+    const ai = shownItems.findIndex((m) => m.id === active);
+    drop.hidden = ai < 0;
+    if (ai >= 0) drop.style.transform = `translateX(${ai * 100}%)`;
+  }
+  applyKey();
 
   // ---------- footer ----------
   const footer = document.querySelector('footer');
   if (footer) {
-    footer.innerHTML = '© ' + new Date().getFullYear() + ' <b>Nguyễn Nam</b> · Mochi AI Lab' +
-      '<br>Mochi AI chạy trên firmware <a href="https://github.com/78/xiaozhi-esp32" rel="noopener">xiaozhi-esp32</a>';
+    footer.innerHTML = '© ' + new Date().getFullYear() + ' <b>Nguyễn Nam</b> · Mochi AI Lab';
   }
 
   window.MochiSite = {
     // extra palette commands from a page: [[icon, text, group, fn], ...]
     addCommands(cmds) { COMMANDS.unshift(...cmds); },
+    hasKey: () => hasKey,
+    // after a key was saved or forgotten (mochi-link.js saveCode / forgetCode)
+    keyChanged() {
+      hasKey = T0 && T0.markKey ? T0.markKey() : hasKey;
+      applyKey();
+    },
     // the status pill: online true (green dot) / false (yellow) / null (connecting, yellow) /
     // 'nokey' (grey: no key saved yet), plus an emoji for the mood. A tap opens the key on Cài đặt.
     status(online, emoji) {

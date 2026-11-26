@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Thống kê · Mochi AI Lab</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<meta name="theme-color" content="#fbf6f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17132a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="theme.js?v=20261270"></script>
+<link rel="stylesheet" href="site.css?v=20261270">
+<link rel="stylesheet" href="glass.css?v=20261270">
+<style>
+.tk { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 18px 0; }
+.tk .card { padding: 18px; }
+.tk b { display: block; font-size: 40px; line-height: 1.1; }
+.tk small { color: var(--muted); font-size: 13.5px; }
+.tk .on b { color: #16a34a; }
+.links { display: flex; gap: 10px; flex-wrap: wrap; }
+.links a { font-weight: 700; }
+#log { font-size: 13.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header data-active="stats"></header>
+
+<main class="wrap">
+  <h1>Thống kê <b>Mochi</b></h1>
+  <p class="lead">Trang riêng cho chủ trang (không có trên menu). Đếm các Mochi đang báo trạng thái lên máy chủ nhắn tin: chỉ thấy số lượng, không đọc được mã hay nội dung của Mochi nào.</p>
+
+  <div class="tk">
+    <div class="card on"><b id="nOn">–</b><small>Mochi đang bật</small></div>
+    <div class="card"><b id="nOff">–</b><small>Mochi đã tắt (máy chủ còn nhớ)</small></div>
+    <div class="card"><b id="nOld">–</b><small>Mochi chạy firmware cũ (mã 6 ký tự)</small></div>
+    <div class="card"><b id="nSeen">–</b><small>Mochi từng thấy trên máy này <span id="since"></span></small></div>
+  </div>
+  <p id="log">Đang kết nối máy chủ…</p>
+
+  <div class="card" style="padding:18px">
+    <h2 style="margin-top:0">Lượt truy cập và lượt nạp firmware</h2>
+    <p class="note">Xem trên GoatCounter: lượt xem từng trang, nguồn truy cập, và sự kiện <code>nap-c3-bat-dau</code> / <code>nap-c3-xong</code> / <code>nap-c3-loi</code>.</p>
+    <div class="links" id="gc"><span class="note">Chưa gắn GoatCounter (điền <code>GC_CODE</code> trong <code>stats.js</code>).</span></div>
+  </div>
+  <p class="note">Mochi bật gửi "online" 2 phút một lần, nên số "đang bật" đủ sau khoảng 2–3 phút mở trang. Máy chủ công cộng tự xoá trạng thái cũ sau một thời gian, nên số "đã tắt" chỉ là ước lượng. "Từng thấy" được nhớ trong trình duyệt này: mở trang này thường xuyên để con số đầy đủ hơn.</p>
+</main>
+<footer></footer>
+<script src="site.js?v=20261270"></script>
+<script src="mochi-link.js?v=20261280"></script>
+<script src="stats.js?v=20261290"></script>
+<script src="thong-ke.js?v=20261280"></script>
+</body>
+</html>

@@ -36,10 +36,24 @@
   }
   apply();
   if (mq && mq.addEventListener) mq.addEventListener('change', apply);
+
+  // Has this browser the key of a Mochi? (mochi-link.js keeps it as mochiKey: localStorage, or
+  // sessionStorage for this tab only.) Without one the site is a showcase: html[data-key="0"]
+  // hides .needkey, html[data-key="1"] hides .intro (site.css), the menu drops Giao diện / Tính
+  // năng (site.js), and pages marked <html data-needkey> go to the home page. Set before paint.
+  const KEY_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{12}$/;
+  function hasKey() {
+    try { return KEY_RE.test(sessionStorage.getItem('mochiKey') || '') || KEY_RE.test(localStorage.getItem('mochiKey') || ''); }
+    catch (e) { return false; }
+  }
+  function markKey() { const k = hasKey(); document.documentElement.dataset.key = k ? '1' : '0'; return k; }
+  if (!markKey() && document.documentElement.hasAttribute('data-needkey')) location.replace('./');
   window.MochiTheme = {
     ACCENTS, get: () => Object.assign({}, t),
     set(part) { t = Object.assign(t, part); put(KEY, JSON.stringify(t)); apply(); },
     // the pages call this with Mochi's body colour; it matters when "Theo Mochi" is picked
     body(i) { if (String(i) !== get('mochiBody', '')) { put('mochiBody', i); apply(); } },
+    // re-read the key after it was saved / forgotten (site.js MochiSite.keyChanged); true = has one
+    markKey,
   };
 })();
