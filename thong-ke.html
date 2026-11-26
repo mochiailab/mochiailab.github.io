@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://broker.emqx.io:8084; frame-src https://mochiailab.goatcounter.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Thống kê · Mochi AI Lab</title>
@@ -24,6 +24,13 @@
 .links { display: flex; gap: 10px; flex-wrap: wrap; }
 .links a { font-weight: 700; }
 #log { font-size: 13.5px; color: var(--muted); }
+.gcframe { width: 100%; height: 75vh; min-height: 520px; border: 0; border-radius: 14px; background: #fff; display: block; margin-top: 12px; }
+.ownerin { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.ownerin input { flex: 1 1 280px; font: inherit; font-size: 15px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-solid); color: var(--text); }
+.ownerin button, .forget2 { font: inherit; font-weight: 700; border-radius: 12px; padding: 12px 18px; cursor: pointer; }
+.ownerin button { border: 0; color: #fff; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.forget2 { border: 1px solid var(--line); background: none; color: var(--muted); padding: 8px 14px; font-size: 13.5px; }
+.err { color: #dc2626; font-size: 14px; margin: 8px 0 0; }
 </style>
 </head>
 <body>
@@ -31,27 +38,39 @@
 
 <main class="wrap">
   <h1>Thống kê <b>Mochi</b></h1>
-  <p class="lead">Trang riêng cho chủ trang (không có trên menu). Đếm các Mochi đang báo trạng thái lên máy chủ nhắn tin: chỉ thấy số lượng, không đọc được mã hay nội dung của Mochi nào.</p>
+  <p class="lead">Trang riêng của chủ Mochi AI Lab: lượt truy cập web, lượt nạp firmware và số Mochi đang chạy. Chỉ hiện trên máy đã lưu link bí mật của GoatCounter.</p>
 
-  <div class="tk">
-    <div class="card on"><b id="nOn">–</b><small>Mochi đang bật</small></div>
-    <div class="card"><b id="nOff">–</b><small>Mochi đã tắt (máy chủ còn nhớ)</small></div>
-    <div class="card"><b id="nOld">–</b><small>Mochi chạy firmware cũ (mã 6 ký tự)</small></div>
-    <div class="card"><b id="nSeen">–</b><small>Mochi từng thấy trên máy này <span id="since"></span></small></div>
+  <!-- not an owner's device: only the box to save the secret link -->
+  <div class="card" id="ownerBox" hidden style="padding:18px">
+    <h2 style="margin-top:0">🔐 Máy của chủ</h2>
+    <p class="note">Dán link bí mật của bảng GoatCounter (dạng <code>https://mochiailab.goatcounter.com?access-token=…</code>). Link chỉ lưu trong trình duyệt máy này; máy có link thì menu hiện mục 📊 Thống kê.</p>
+    <div class="ownerin"><input id="ownerLink" type="password" autocomplete="off" spellcheck="false" placeholder="https://mochiailab.goatcounter.com?access-token=…" aria-label="Link bí mật GoatCounter"><button id="ownerSave" type="button">Lưu trên máy này</button></div>
+    <p class="err" id="ownerErr" hidden></p>
   </div>
-  <p id="log">Đang kết nối máy chủ…</p>
 
-  <div class="card" style="padding:18px">
-    <h2 style="margin-top:0">Lượt truy cập và lượt nạp firmware</h2>
-    <p class="note">Xem trên GoatCounter: lượt xem từng trang, nguồn truy cập, và sự kiện <code>nap-c3-bat-dau</code> / <code>nap-c3-xong</code> / <code>nap-c3-loi</code>.</p>
-    <div class="links" id="gc"><span class="note">Chưa gắn GoatCounter (điền <code>GC_CODE</code> trong <code>stats.js</code>).</span></div>
+  <div id="ownerArea" hidden>
+    <div class="tk">
+      <div class="card on"><b id="nOn">–</b><small>Mochi đang bật</small></div>
+      <div class="card"><b id="nOff">–</b><small>Mochi đã tắt (máy chủ còn nhớ)</small></div>
+      <div class="card"><b id="nOld">–</b><small>Mochi chạy firmware cũ (mã 6 ký tự)</small></div>
+      <div class="card"><b id="nSeen">–</b><small>Mochi từng thấy trên máy này <span id="since"></span></small></div>
+    </div>
+    <p id="log">Đang kết nối máy chủ…</p>
+
+    <div class="card" style="padding:18px">
+      <h2 style="margin-top:0">Lượt truy cập và lượt nạp firmware</h2>
+      <p class="note">Bảng GoatCounter: lượt xem từng trang, nguồn truy cập, và sự kiện <code>nap-c3-bat-dau</code> / <code>nap-c3-xong</code> / <code>nap-c3-loi</code>.</p>
+      <a class="forget2" id="gcOpen" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none">↗ Mở bảng GoatCounter trong tab mới</a>
+      <iframe class="gcframe" id="gcFrame" title="Thống kê GoatCounter" referrerpolicy="no-referrer"></iframe>
+    </div>
+    <p class="note">Mochi bật gửi "online" 2 phút một lần, nên số "đang bật" đủ sau khoảng 2–3 phút mở trang. Máy chủ công cộng tự xoá trạng thái cũ sau một thời gian, nên số "đã tắt" chỉ là ước lượng. "Từng thấy" được nhớ trong trình duyệt này.</p>
+    <button class="forget2" id="ownerForget" type="button">Quên link chủ trên máy này</button>
   </div>
-  <p class="note">Mochi bật gửi "online" 2 phút một lần, nên số "đang bật" đủ sau khoảng 2–3 phút mở trang. Máy chủ công cộng tự xoá trạng thái cũ sau một thời gian, nên số "đã tắt" chỉ là ước lượng. "Từng thấy" được nhớ trong trình duyệt này: mở trang này thường xuyên để con số đầy đủ hơn.</p>
 </main>
 <footer></footer>
-<script src="site.js?v=20261270"></script>
+<script src="site.js?v=20261300"></script>
 <script src="mochi-link.js?v=20261280"></script>
 <script src="stats.js?v=20261290"></script>
-<script src="thong-ke.js?v=20261280"></script>
+<script src="thong-ke.js?v=20261301"></script>
 </body>
 </html>

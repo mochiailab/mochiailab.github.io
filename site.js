@@ -11,6 +11,7 @@
     { id: 'home', href: './', text: 'Trang chủ', icon: '🏠' },
     { id: 'look', href: 'giao-dien.html', text: 'Giao diện', icon: '🎨', key: true },
     { id: 'features', href: 'tinh-nang.html', text: 'Tính năng', icon: '✨', key: true },
+    { id: 'stats', href: 'thong-ke.html', text: 'Thống kê', icon: '📊', owner: true },
     { id: 'settings', href: 'cai-dat.html', text: 'Cài đặt', icon: '⚙️' },
   ];
   // pages that live inside a menu item (the firmware pages are part of Cài đặt)
@@ -19,6 +20,11 @@
   // has a Mochi key (theme.js markKey: html[data-key])
   const T0 = window.MochiTheme;
   let hasKey = document.documentElement.dataset.key === '1';
+  // the owner's devices: the GoatCounter secret link saved on thong-ke.html (mochiOwner); items
+  // with owner: true (and palette commands of the 'Chủ' group) only show there
+  const ownerNow = () => { try { return !!localStorage.getItem('mochiOwner'); } catch (e) { return false; } };
+  let isOwner = ownerNow();
+  const shows = (m) => (hasKey || !m.key) && (isOwner || !m.owner);
   const LOGO = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="10" width="56" height="48" rx="22" fill="#f7b6cb"/>' +
     '<rect x="18" y="26" width="8" height="11" rx="4" fill="#2c2838"/><rect x="38" y="26" width="8" height="11" rx="4" fill="#2c2838"/>' +
     '<circle cx="20" cy="28" r="1.6" fill="#fff"/><circle cx="40" cy="28" r="1.6" fill="#fff"/>' +
@@ -94,7 +100,7 @@
   // ---------- quick search / commands (Ctrl+K) ----------
   const fold = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
   const COMMANDS = [
-    ...MENU.map((m) => [m.icon, 'Mở trang ' + m.text, m.key ? 'Mochi' : 'Trang', () => { location.href = m.href; }]),
+    ...MENU.map((m) => [m.icon, 'Mở trang ' + m.text, m.owner ? 'Chủ' : m.key ? 'Mochi' : 'Trang', () => { location.href = m.href; }]),
     ['🔑', 'Nhập mã của Mochi', 'Trang', () => { location.href = 'cai-dat.html#ma'; }],
     ['⚡', 'Nạp firmware cho Mochi mới', 'Trang', () => { location.href = 'cai-dat.html#nap'; }],
     ['☀️', 'Giao diện sáng', 'Màu', () => T && T.set({ mode: 'light' })],
@@ -108,7 +114,7 @@
   let sel = 0, shown = [];
   function render() {
     const q = fold(input.value.trim());
-    shown = COMMANDS.filter((c) => (hasKey || c[2] !== 'Mochi') && fold(c[1]).includes(q)).slice(0, 12);
+    shown = COMMANDS.filter((c) => (hasKey || c[2] !== 'Mochi') && (isOwner || c[2] !== 'Chủ') && fold(c[1]).includes(q)).slice(0, 12);
     sel = Math.min(sel, Math.max(0, shown.length - 1));
     list.innerHTML = shown.map((c, i) => `<li class="${i === sel ? 'sel' : ''}" data-i="${i}">${c[0]} ${c[1]}<small>${c[2]}</small></li>`).join('') ||
       '<li>Không thấy lệnh nào</li>';
@@ -132,7 +138,7 @@
   const dock = el('nav', 'dock', '<i class="drop" aria-hidden="true"></i>');
   dock.setAttribute('aria-label', 'Menu');
   const drop = dock.querySelector('.drop');
-  const visible = () => MENU.filter((m) => hasKey || !m.key);
+  const visible = () => MENU.filter(shows);
   MENU.forEach((m) => {
     const a = el('a', m.id === active ? 'active' : null, `<span>${m.icon}</span>${m.text}`);
     a.href = m.href; a.dataset.id = m.id;
@@ -167,6 +173,7 @@
     // after a key was saved or forgotten (mochi-link.js saveCode / forgetCode)
     keyChanged() {
       hasKey = T0 && T0.markKey ? T0.markKey() : hasKey;
+      isOwner = ownerNow();
       applyKey();
     },
     // the status pill: online true (green dot) / false (yellow) / null (connecting, yellow) /
